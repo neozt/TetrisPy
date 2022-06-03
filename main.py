@@ -16,6 +16,8 @@ clock = pygame.time.Clock()
 game = Game()
 renderer = Renderer(game, screen)
 
+i = 0
+
 while game.running:
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -24,23 +26,13 @@ while game.running:
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
                 game.stop_game()
-            # elif event.key == K_RIGHT:
-            #     game.move_mino_right()
-            # elif event.key == K_LEFT:
-            #     game.move_mino_left()
-            elif event.key == K_UP:
-                game.mino.rotate_cw()
-            elif event.key == K_z:
-                game.mino.rotate_ccw()
-            elif event.key == K_SPACE:
-                game.hard_drop()
 
     keys = pygame.key.get_pressed()
-    game.soft_dropping = True if keys[K_DOWN] else False
-
     game.process_inputs(keys)
 
+    game.handle_gravity()
     game.perform_moves()
+    
     renderer.render_game()
     pygame.display.update()
 
@@ -54,9 +46,10 @@ while game.running:
         print(cleared_lines)
         renderer.line_clear_animation(cleared_lines)
 
-    # clock.tick(Renderer.FRAMERATE)
+    clock.tick(Renderer.FRAMERATE)
     game.handle_gravity()
-    time.sleep(1)
+    i +=1
+    # time.sleep(2)
     game.tick()
 
 pygame.quit()

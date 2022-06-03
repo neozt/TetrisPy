@@ -20,15 +20,8 @@ class Game:
         self.tick_counter = 0
 
     def handle_gravity(self):
-        if self.soft_dropping:
-            wait_time = self.double_gravity
-        else:
-            wait_time = self.gravity
-        if self.tick_counter >= wait_time:
-            self.mino.move('down')
-            self.tick_counter = 0
-        # self.tick()
-    
+        self.move_handler.handle_gravity()
+
     def check_and_handle_line_clears(self):
         cleared_lines = self.board.find_cleared_lines()
         if cleared_lines:
@@ -54,17 +47,45 @@ class Game:
     def move_mino_down(self):
         self.mino.move('down')
 
-    def hard_drop(self):
+    def rotate_mino_cw(self):
+        self.mino.rotate_cw()
+
+    def rotate_mino_ccw(self):
+        self.mino.rotate_ccw()        
+
+    def rotate_mino_180(self):
+        pass
+
+    def harddrop_mino(self):
         self.mino.hard_drop()
         self.board.add_mino_to_board(self.mino)
         self.mino = self.queue.pop()
 
+    def softdrop_mino(self):
+        self.mino.move('down')
+
     def perform_moves(self):
-        moves = self.move_handler.move_count
-        for i in range(moves['left']):
-            self.move_mino_left()
-        for i in range(moves['right']):
-            self.move_mino_right()
+        for move, count in self.move_handler.move_count.items():
+            for i in range(count):
+                self.perform_move(move)
+
+    def perform_move(self, move):
+        match(move):
+            case 'left':
+                self.move_mino_left()
+            case 'right':
+                self.move_mino_right()
+            case 'rotatecw':
+                self.rotate_mino_cw()
+            case 'rotateccw':
+                self.rotate_mino_ccw()
+            case 'rotate180':
+                self.rotate_mino_180()
+            case 'down':
+                self.softdrop_mino()
+            case 'harddrop':
+                self.harddrop_mino()
+    
 
     def process_inputs(self, keys):
         self.move_handler.process_inputs(keys)
