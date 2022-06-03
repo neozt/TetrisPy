@@ -5,6 +5,7 @@ from pygame.locals import *
 from game import *
 from renderer import Renderer
 import util
+from movehandler import MovementHandler
 
 pygame.init()
 screen = pygame.display.set_mode((Renderer.SCREEN_WIDTH, Renderer.SCREEN_HEIGHT))
@@ -39,7 +40,6 @@ while game.running:
 
     game.process_inputs(keys)
 
-
     game.perform_moves()
     renderer.render_game()
     pygame.display.update()
@@ -54,8 +54,9 @@ while game.running:
         print(cleared_lines)
         renderer.line_clear_animation(cleared_lines)
 
-    clock.tick(Renderer.FRAMERATE)
+    # clock.tick(Renderer.FRAMERATE)
     game.handle_gravity()
+    time.sleep(1)
     game.tick()
 
 pygame.quit()

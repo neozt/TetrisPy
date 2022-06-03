@@ -3,7 +3,7 @@ from piecequeue import PieceQueue
 from mino import Mino
 from board import Board
 from renderer import Renderer
-from movehandler import MoveHandler
+from movehandler import MovementHandler
 
 class Game:
     SOFT_DROP_MULTIPLIER = 4
@@ -12,15 +12,12 @@ class Game:
         self.board = Board()
         self.queue = PieceQueue(self.board)
         self.mino = self.queue.pop()
-        self.move_handler = MoveHandler(self)
+        self.move_handler = MovementHandler(self)
         self.running = True
         self.gravity = gravity     # Number of frames to wait before mino move down 1 block
         self.double_gravity = self.gravity // Game.SOFT_DROP_MULTIPLIER
         self.soft_dropping = False
         self.tick_counter = 0
-
-    def tick(self):
-        self.tick_counter += 1
 
     def handle_gravity(self):
         if self.soft_dropping:
@@ -30,7 +27,7 @@ class Game:
         if self.tick_counter >= wait_time:
             self.mino.move('down')
             self.tick_counter = 0
-        self.tick()
+        # self.tick()
     
     def check_and_handle_line_clears(self):
         cleared_lines = self.board.find_cleared_lines()
@@ -63,7 +60,7 @@ class Game:
         self.mino = self.queue.pop()
 
     def perform_moves(self):
-        moves = self.move_handler.get_move_count()
+        moves = self.move_handler.move_count
         for i in range(moves['left']):
             self.move_mino_left()
         for i in range(moves['right']):
