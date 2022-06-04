@@ -15,6 +15,7 @@ class Renderer:
         self.draw_board()
         self.draw_mino()
         self.draw_previews()
+        self.draw_hold()
 
     def draw_board(self):
         board_cells = pygame.sprite.Group()
@@ -44,6 +45,22 @@ class Renderer:
                 preview_cells.add(block)
         for cell in preview_cells:
             self.screen.blit(cell.surf, cell.coords)
+
+    def draw_hold(self):
+        hold_cells = pygame.sprite.Group()
+        mino = self.game.mino_holder.held_mino
+        if mino is not None:
+            blocks = mino.preview_positions() 
+            colour = mino.colour 
+        else:
+            blocks = []
+            colour = 'grey'
+        for block in blocks:
+            block = HoldCellSurface(block, colour)
+            hold_cells.add(block)
+        for cell in hold_cells:
+            self.screen.blit(cell.surf, cell.coords)
+
 
     def line_clear_animation(self, cleared_lines):
         pass
@@ -84,3 +101,21 @@ class PreviewCellSurface(pygame.sprite.Sprite):
         offset_from_top = preview_position * (PreviewCellSurface.CELL_LENGTH * 2 + PreviewCellSurface.PREVIEW_GAP)
         y_actual = y * length + PreviewCellSurface.PREVIEWER_ORIGIN[1] + offset_from_top
         return (x_actual, y_actual)   
+
+class HoldCellSurface(pygame.sprite.Sprite):
+    CELL_LENGTH = 30
+    HOLDER_ORIGIN = (20,50)
+
+    def __init__(self, coords, colour):
+        super(HoldCellSurface, self).__init__()
+        self.surf = pygame.Surface((HoldCellSurface.CELL_LENGTH, HoldCellSurface.CELL_LENGTH))
+        self.surf.fill(colour)
+        self.rect = self.surf.get_rect()
+        self.coords = HoldCellSurface.get_hold_block_coords(coords, HoldCellSurface.CELL_LENGTH)
+
+    @staticmethod
+    def get_hold_block_coords(coords, length):
+        y, x = coords
+        x_actual = x * length + HoldCellSurface.HOLDER_ORIGIN[0]
+        y_actual = y * length + HoldCellSurface.HOLDER_ORIGIN[1]
+        return (x_actual, y_actual) 
