@@ -35,7 +35,6 @@ while game.running:
 
     cleared_lines = game.check_and_handle_line_clears()
     if cleared_lines:
-        print(cleared_lines)
         renderer.line_clear_animation(cleared_lines)
         
     if game.check_death() == True:

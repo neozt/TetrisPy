@@ -4,6 +4,7 @@ from mino import Mino
 from board import Board
 from renderer import Renderer
 from movehandler import MovementHandler
+from hold import Hold
 
 class Game:
     SOFT_DROP_MULTIPLIER = 4
@@ -12,6 +13,7 @@ class Game:
         self.board = Board()
         self.queue = PieceQueue(self.board)
         self.mino = self.queue.pop()
+        self.mino_holder = Hold(self)
         self.move_handler = MovementHandler(self)
         self.running = True
         self.gravity = gravity     # Number of frames to wait before mino move down 1 block
@@ -59,10 +61,25 @@ class Game:
     def harddrop_mino(self):
         self.mino.hard_drop()
         self.board.add_mino_to_board(self.mino)
-        self.mino = self.queue.pop()
+        self.get_next_mino()
+        self.mino_holder.enable_hold()
 
     def softdrop_mino(self):
         self.mino.move('down')
+
+    def hold(self):
+        try:
+            new_mino = self.mino_holder.hold_mino(self.mino)
+            if new_mino is not None:
+                self.mino = new_mino
+            else:
+                self.get_next_mino()
+            self.mino_holder.disable_hold()
+        except Exception as e:
+            pass
+
+    def get_next_mino(self):
+        self.mino = self.queue.pop()
 
     def perform_moves(self):
         for move, count in self.move_handler.move_count.items():
@@ -85,6 +102,8 @@ class Game:
                 self.softdrop_mino()
             case 'harddrop':
                 self.harddrop_mino()
+            case 'hold':
+                self.hold()
     
 
     def process_inputs(self, keys):

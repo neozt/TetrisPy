@@ -47,7 +47,9 @@ class MovementHandler:
             'down': 0,
             'harddrop': 0,
             'rotatecw': 0,
-            'rotateccw': 0
+            'rotateccw': 0,
+            'hold': 0,
+            'rotate180': 0
         }
 
     def was_moving_left(self):
@@ -70,7 +72,7 @@ class MovementHandler:
         self.handle_rotation(keys)
         self.handle_drop(keys)
         if keys[HOLD]:
-            pass
+            self.add_move('hold')
 
     def handle_movement(self, keys):
         if keys[MOVE_LEFT]:

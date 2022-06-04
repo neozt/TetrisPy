@@ -118,6 +118,10 @@ class Mino(ABC):
             move_success = self.move('down')
             final = not move_success
 
+    def reset_position(self):
+        self.orientation = self.spawn_orientation()
+        self.center = self.spawn_position()
+
 class IMino(Mino):
     colour = 'light blue'
 
