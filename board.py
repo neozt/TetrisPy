@@ -54,7 +54,6 @@ class Board:
         return True
 
     def clear_lines(self, lines):
-        print(f'{lines}:\n{self}')
         for line_no in sorted(lines, reverse = True):
             self.board.pop(line_no)
         for i in range(len(lines)):    

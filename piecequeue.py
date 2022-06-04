@@ -16,13 +16,16 @@ class PieceQueue:
     def add_new_bag(self):
         bag = ['I','L','J','T','S','Z','O']
         random.shuffle(bag)
-        self.queue.extend(bag)
+        for piece in bag:
+            self.queue.append(mino.create_mino(piece, self.board))
 
     def pop(self):
         if len(self.queue) <= PREVIEW_LENGTH:
             self.add_new_bag()
-        first = mino.create_mino(self.queue.pop(0), self.board)
-        return first
+        return self.queue.pop(0)
+
+    def peek(self, num):
+        return self.queue[0:num]
 
 def main():
     queue = PieceQueue(None)

@@ -125,6 +125,10 @@ class IMino(Mino):
     def spawn_position():
         return (1,5)
 
+    @staticmethod
+    def preview_positions():
+        return [(0,0), (0,1), (0,2), (0,3)]
+
     @property
     def block_positions(self):
         if self.orientation == Mino.MINO_UP:
@@ -157,6 +161,10 @@ class JMino(Mino):
     def spawn_position():
         return (0,4)
 
+    @staticmethod
+    def preview_positions():
+        return [(0,0), (1,0), (1,1), (1,2)]
+
     @property
     def block_positions(self):
         if self.orientation == Mino.MINO_UP:
@@ -187,6 +195,10 @@ class LMino(Mino):
     @staticmethod
     def spawn_position():
         return (0,4)
+
+    @staticmethod
+    def preview_positions():
+        return [(1,0), (1,1), (1,2), (0,2)]
 
     @property
     def block_positions(self):
@@ -219,6 +231,10 @@ class OMino(Mino):
     def spawn_position():
         return (1,5)
 
+    @staticmethod
+    def preview_positions():
+        return [(0,0), (1,0), (0,1), (1,1)]
+
     @property
     def block_positions(self):
         block1 = self.offset_from_center((-1, -1))
@@ -234,6 +250,10 @@ class SMino(Mino):
     def spawn_position():
         return (0,4)
     
+    @staticmethod
+    def preview_positions():
+        return [(1,0), (1,1), (0,1), (0,2)]
+
     @property
     def block_positions(self):
         if self.orientation == Mino.MINO_UP:
@@ -265,6 +285,10 @@ class TMino(Mino):
     def spawn_position():
         return (0,4)
 
+    @staticmethod
+    def preview_positions():
+        return [(0,1), (1,0), (1,1), (1,2)]
+
     @property
     def block_positions(self):
         if self.orientation == Mino.MINO_UP:
@@ -295,6 +319,10 @@ class ZMino(Mino):
     @staticmethod
     def spawn_position():
         return (0,4)
+
+    @staticmethod
+    def preview_positions():
+        return [(0,0), (0,1), (1,1), (1,2)]
 
     @property
     def block_positions(self):
