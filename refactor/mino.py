@@ -208,13 +208,13 @@ def rotate(point: Position) -> Position:
     return Position(point.y, -point.x)
 
 def test():
-    a = create_mino('O')
+    a = create_mino('Z')
     print(a)
     print(a.normalised_positions)
     print(a.blocks)
     a.orientation = Orientation.DOWN
     print(a.blocks)
-    a.orientation = Orientation.UP
+    a.orientation = Orientation.RIGHT
     print(a.blocks)
     a.orientation = Orientation.LEFT
     print(a.blocks)

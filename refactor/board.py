@@ -1,4 +1,4 @@
-from position import Block
+from position import Position
 
 ROWS = 20
 COLUMNS = 10
@@ -25,20 +25,20 @@ class Board:
             board += '|' + '\n'
         return divider + '\n' + board + divider
 
-    def set_cell_colour(self, cell: Block, colour: str) -> None:
+    def set_cell_colour(self, cell: Position, colour: str) -> None:
         try:
             self.board_arr[cell.y][cell.x] = colour
         except IndexError:
             raise ValueError(f'Cell should be within (0,0) -> ({ROWS-1},{COLUMNS-1})')
             
-    def get_cell_colour(self, cell: Block) -> None:
+    def get_cell_colour(self, cell: Position) -> None:
         try:
             return self.board_arr[cell.y][cell.x]
         except IndexError:
             raise ValueError(f'Cell should be within (0,0) -> ({ROWS-1},{COLUMNS-1})')
 
-    def is_cell_occupied(self, cell: Block) -> bool:
-        if not 0 <= cell.x <= COLUMNS or not 0 <= cell.y <= ROWS: 
+    def is_cell_occupied(self, cell: Position) -> bool:
+        if not 0 <= cell.x < COLUMNS or not 0 <= cell.y < ROWS: 
             return False
         return not is_empty(self.get_cell_colour(cell))
 
@@ -91,18 +91,18 @@ def is_row_filled(row) -> bool:
 
 def test():
     board = Board()
-    board.set_cell_colour(Block(0,0), 'red')
-    board.set_cell_colour(Block(9,2), 'green')
-    board.set_cell_colour(Block(9,19), 'green')
-    a = board.get_cell_colour(Block(0,0))
-    b = board.get_cell_colour(Block(0,11))
+    board.set_cell_colour(Position(0,0), 'red')
+    board.set_cell_colour(Position(9,2), 'green')
+    board.set_cell_colour(Position(9,19), 'green')
+    a = board.get_cell_colour(Position(0,0))
+    b = board.get_cell_colour(Position(0,11))
     print(board)
     for i in range(COLUMNS):
-        cell = Block(i, 1)
+        cell = Position(i, 1)
         board.set_cell_colour(cell, 'yellow')
-        cell = Block(i, 5)
+        cell = Position(i, 5)
         board.set_cell_colour(cell, 'yellow')
-        cell = Block(i, 10)
+        cell = Position(i, 10)
         board.set_cell_colour(cell, 'yellow')
     print(board)
     bm = BoardManager(board)
