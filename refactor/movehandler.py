@@ -42,15 +42,15 @@ def do_if_valid(fn):
 class MoveHandler:
     @do_if_valid
     def move_mino_left(self, mino: Mino, board: Board):
-        mino.center += Position(-1, 0)
+        mino.left()
 
     @do_if_valid
     def move_mino_right(self, mino: Mino, board: Board):
-        mino.center += Position(1, 0)
+        mino.right()
 
     @do_if_valid
     def move_mino_down(self, mino: Mino, board: Board):
-        mino.center += Position(0,-1)
+        mino.down()
 
     def hard_drop_mino(self, mino: Mino, board: Board):
         dropped = self.move_mino_down(mino, board)

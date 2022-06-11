@@ -50,11 +50,33 @@ class Mino(ABC):
         
         return block_positions
 
+    def left(self) -> None:
+        self.translate((-1,0))
+
+    def right(self) -> None:
+        self.translate((1,0))
+
+    def down(self) -> None:
+        self.translate((0,-1))
+
+    def translate(self, offset: tuple[int,int]) -> None:
+        offset = Position(*offset)
+        self.center += offset
+
+    def rotate_cw(self) -> None:
+        new_orientation = (self.orientation.value + 1) % len(Orientation)
+        self.orientation = Orientation(new_orientation)
+
+    def rotate_cw(self) -> None:
+        new_orientation = (self.orientation.value - 1) % len(Orientation)
+        self.orientation = Orientation(new_orientation)
+        
 
 @dataclass
 class IMino(Mino):
     center: GridPosition = GridPosition(5, 19)
     colour: str = 'light blue'
+    type: str = 'I'
 
     @property 
     def blocks(self) -> list[Position]:
@@ -95,6 +117,7 @@ class IMino(Mino):
 class OMino(Mino):
     center: GridPosition = GridPosition(5, 19)
     colour: str = 'light blue'
+    type: str = 'O'
 
     @property 
     def blocks(self) -> list[Position]:
@@ -132,6 +155,7 @@ class JMino(Mino):
 class LMino(Mino):
     center: Position = Position(4, 19)
     colour: str = 'orange'
+    type: str = 'L'
 
     @property
     def normalised_positions(self) -> list[Position]:
@@ -146,6 +170,7 @@ class LMino(Mino):
 class SMino(Mino):
     center: Position = Position(4, 19)
     colour: str = 'green'
+    type: str = 'S'
 
     @property
     def normalised_positions(self) -> list[Position]:
@@ -160,6 +185,7 @@ class SMino(Mino):
 class ZMino(Mino):
     center: Position = Position(4, 19)
     colour: str = 'red'
+    type: str = 'Z'
 
     @property
     def normalised_positions(self) -> list[Position]:
@@ -174,6 +200,7 @@ class ZMino(Mino):
 class TMino(Mino):
     center: Position = Position(4, 19)
     colour: str = 'purple'
+    type: str = 'T'
 
     @property
     def normalised_positions(self) -> list[Position]:
@@ -183,8 +210,6 @@ class TMino(Mino):
             Position(0,1), 
             Position(1,0) 
             ]
-
-
 
 def create_mino(type: str) -> Mino:
     match type:
@@ -210,14 +235,8 @@ def rotate(point: Position) -> Position:
 def test():
     a = create_mino('Z')
     print(a)
-    print(a.normalised_positions)
-    print(a.blocks)
-    a.orientation = Orientation.DOWN
-    print(a.blocks)
-    a.orientation = Orientation.RIGHT
-    print(a.blocks)
-    a.orientation = Orientation.LEFT
-    print(a.blocks)
+    a.translate((-5,3))
+    print(a)
 
 if __name__ == '__main__':
     test()
