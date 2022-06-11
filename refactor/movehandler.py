@@ -57,6 +57,7 @@ class MoveHandler:
         mino.down()
 
     def hard_drop(self, mino: Mino, board: Board) -> None:
+        # Move mino down until no longer possible
         dropped = self.move_mino_down(mino, board)
         while (dropped):
             dropped = self.move_mino_down(mino, board)
@@ -75,6 +76,7 @@ class MoveHandler:
         elif direction == 'ccw':
             target_orientation = current_orientation.counterclockwise()
             
+        # Try each kicks in the kick table in sequence until the first valid kick is found
         kicks = self.kick_table.get_kicks(current_orientation.value, target_orientation.value, mino.type)
         for kick in kicks:
             success = self.try_rotate(mino, board, direction, kick)
@@ -83,14 +85,15 @@ class MoveHandler:
         return success
 
     @undo_if_invalid
-    def try_rotate(self, mino: Mino, board: Board, direction: str, offset: tuple) -> bool:
-        mino.translate(offset)
+    def try_rotate(self, mino: Mino, board: Board, direction: str, offset: tuple[int, int]) -> bool:
+        # Rotates based on direction
         if direction == 'cw':
             mino.rotate_cw()
         elif direction == 'ccw':
             mino.rotate_ccw()
-        else:
-            raise ValueError()
+
+        # "Kick" the mino by translated based on the offset
+        mino.translate(offset)
 
     
 
