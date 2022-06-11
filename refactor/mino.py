@@ -10,6 +10,12 @@ class Orientation(Enum):
     DOWN = 2
     LEFT = 3
 
+    def clockwise(self):
+        return Orientation((self.value + 1) % len(Orientation))
+
+    def counterclockwise(self):
+        return Orientation((self.value - 1) % len(Orientation))
+
 def rotations_required(start: Orientation, end:Orientation):
     return (end.value - start.value) % len(Orientation)
 
@@ -58,7 +64,7 @@ class Mino(ABC):
 
     def translate(self, offset: tuple[int,int]) -> None:
         x, y = offset
-        self.center += Position(x, y)
+        self.center = self.center + Position(x, y)
 
     def rotate_cw(self) -> None:
         new_orientation = (self.orientation.value + 1) % len(Orientation)

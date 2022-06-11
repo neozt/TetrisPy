@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
+from tkinter import Grid
 
 @dataclass
 class Position:
@@ -10,15 +11,12 @@ class Position:
         return f'{type(self).__name__}({self.x}, {self.y})'
 
     def __add__(self, other: Position) -> Position:
-        if type(other) is not type(self):
+        if not isinstance(other, Position):
             raise TypeError('Position object can only be added to other Position objects')
-        return Position(self.x + other.x, self.y + other.y)
+        return type(self)(self.x + other.x, self.y + other.y)
 
 @dataclass
-class GridPosition:
-    x: int
-    y: int
-
+class GridPosition(Position):
     @property
     def top_left_position(self) -> Position:
         return Position(self.x - 1, self.y)
@@ -38,7 +36,9 @@ class GridPosition:
 
 
 def test():
-    pass
+    a = GridPosition(0,0)
+    b = a + Position(3,0)
+    print(b)
 
 if __name__ == '__main__':
     test()

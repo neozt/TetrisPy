@@ -21,11 +21,11 @@ SRS_I_KICKS = [
 ]
 
 class KickTable:
-    def __init__(self, normal_table = SRS_NORMAL_KICKS, I_table = SRS_I_KICKS):
+    def __init__(self, normal_table = SRS_NORMAL_KICKS, I_table = SRS_I_KICKS) -> None:
         self.normal_table = normal_table
         self.I_table = I_table
 
-    def get_kicks(self, from_orientation: int, to_orientation: int, mino_type: str):
+    def get_kicks(self, from_orientation: int, to_orientation: int, mino_type: str) -> list[tuple[int,int]]:
         if mino_type == 'I':
             kick_table = self.I_table
         else:

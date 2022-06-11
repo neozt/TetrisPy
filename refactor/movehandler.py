@@ -2,9 +2,10 @@ from copy import copy
 
 import mino as mn
 import board as bd
-from mino import Mino
+from mino import Mino, Orientation
 from board import Board
 from position import Position
+from kicktable import KickTable
 
 def is_valid_position(mino: Mino, board: Board):
     # Check to ensure that none of the mino's blocks are outside playing area or in an occupied cell
@@ -20,54 +21,96 @@ def is_valid_position(mino: Mino, board: Board):
 
     return True
 
-def do_if_valid(fn):
+def undo_if_invalid(fn) -> bool:
     # Decorator to save position of mino before performing move 
     # And restores the mino back to the original position if the move results in an invalid mino position
     # Returns if the move was successful or not
-    def wrapfn(*args, **kwargs):
+    def wrappedfn(*args, **kwargs):
         mino = args[1]
         board = args[2]
         original_center = copy(mino.center)
         original_orientation = copy(mino.orientation)
         fn(*args, **kwargs)
 
-        valid = is_valid_position(mino, board)
-        if not valid:
+        success = is_valid_position(mino, board)
+        if not success:
             mino.center = original_center
             mino.orientation = original_orientation
-        return valid
+        return success
             
-    return wrapfn
+    return wrappedfn
 
 class MoveHandler:
-    @do_if_valid
-    def move_mino_left(self, mino: Mino, board: Board):
+    def __init__(self, kick_table: KickTable = KickTable()) -> None:
+        self.kick_table = kick_table
+        
+    @undo_if_invalid
+    def move_left(self, mino: Mino, board: Board) -> bool:
         mino.left()
 
-    @do_if_valid
-    def move_mino_right(self, mino: Mino, board: Board):
+    @undo_if_invalid
+    def move_right(self, mino: Mino, board: Board) -> bool:
         mino.right()
 
-    @do_if_valid
-    def move_mino_down(self, mino: Mino, board: Board):
+    @undo_if_invalid
+    def move_down(self, mino: Mino, board: Board) -> bool:
         mino.down()
 
-    def hard_drop_mino(self, mino: Mino, board: Board):
+    def hard_drop(self, mino: Mino, board: Board) -> None:
         dropped = self.move_mino_down(mino, board)
         while (dropped):
             dropped = self.move_mino_down(mino, board)
 
+
+    def rotate_cw(self, mino: Mino, board: Board) -> bool:
+        return self.rotate(mino, board, 'cw')
+
+    def rotate_ccw(self, mino: Mino, board: Board) -> bool:
+        return self.rotate(mino, board, 'ccw')
+
+    def rotate(self, mino: Mino, board: Board, direction: str) -> bool:
+        current_orientation = mino.orientation
+        if direction == 'cw':
+            target_orientation  = current_orientation.clockwise()
+        elif direction == 'ccw':
+            target_orientation = current_orientation.counterclockwise()
+            
+        kicks = self.kick_table.get_kicks(current_orientation.value, target_orientation.value, mino.type)
+        for kick in kicks:
+            success = self.try_rotate(mino, board, direction, kick)
+            if success:
+                break
+        return success
+
+    @undo_if_invalid
+    def try_rotate(self, mino: Mino, board: Board, direction: str, offset: tuple) -> bool:
+        mino.translate(offset)
+        if direction == 'cw':
+            mino.rotate_cw()
+        elif direction == 'ccw':
+            mino.rotate_ccw()
+        else:
+            raise ValueError()
+
+    
 
 def test():
     mover = MoveHandler()
     mino = mn.create_mino('Z')
     board = Board()
     print(mino)
-    mover.move_mino_left(mino, board)
-    mover.hard_drop_mino(mino, board)
-    print(mino)
-    print(mino.blocks)
+    board.set_cell_colour(Position(3,19) , 'red')
+    board.set_cell_colour(Position(5,19) , 'red')
+    board.set_cell_colour(Position(4,16) , 'red')
 
+
+    def rotate_and_print():
+        print(mover.rotate_cw(mino,board))
+        print(mino)
+        print(mino.blocks)
+
+
+    rotate_and_print()
 
 
 if __name__ == '__main__':

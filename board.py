@@ -1,6 +1,3 @@
-from asyncio.proactor_events import _ProactorDuplexPipeTransport
-
-
 class Board:
     ROWS = 20
     COLUMNS = 10
