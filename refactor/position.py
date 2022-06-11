@@ -29,11 +29,11 @@ class GridPosition:
     
     @property
     def bottom_left_position(self) -> Position:
-        return Position(self.x, self.y - 1)
+        return Position(self.x - 1, self.y - 1)
 
     @property
     def bottom_right_position(self) -> Position:
-        return Position(self.x - 1, self.y - 1)
+        return Position(self.x, self.y - 1)
 
 
 

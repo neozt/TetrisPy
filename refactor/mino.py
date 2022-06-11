@@ -10,12 +10,8 @@ class Orientation(Enum):
     DOWN = 2
     LEFT = 3
 
-ROTATIONS_REQUIRED = {
-    Orientation.UP: 0,
-    Orientation.RIGHT: 1,
-    Orientation.DOWN: 2,
-    Orientation.LEFT: 3
-}
+def rotations_required(start: Orientation, end:Orientation):
+    return (end.value - start.value) % len(Orientation)
 
 @dataclass
 class Mino(ABC):
@@ -38,10 +34,11 @@ class Mino(ABC):
         # - Then, rotate it into the correct orientation followed by a translation to get the actual positions of the blocks 
         normalised_positions = self.normalised_positions
         block_positions = []
+        times_to_rotate = rotations_required(Orientation.UP, self.orientation)
         for block in normalised_positions:
             # Rotate to correct orientation
             correctly_oriented = block
-            for _ in range(ROTATIONS_REQUIRED[self.orientation]):
+            for _ in range(times_to_rotate):
                 correctly_oriented = rotate(correctly_oriented)
 
             # And then add mino's center position to each to get actual position
@@ -60,14 +57,14 @@ class Mino(ABC):
         self.translate((0,-1))
 
     def translate(self, offset: tuple[int,int]) -> None:
-        offset = Position(*offset)
-        self.center += offset
+        x, y = offset
+        self.center += Position(x, y)
 
     def rotate_cw(self) -> None:
         new_orientation = (self.orientation.value + 1) % len(Orientation)
         self.orientation = Orientation(new_orientation)
 
-    def rotate_cw(self) -> None:
+    def rotate_ccw(self) -> None:
         new_orientation = (self.orientation.value - 1) % len(Orientation)
         self.orientation = Orientation(new_orientation)
         
@@ -213,30 +210,26 @@ class TMino(Mino):
 
 def create_mino(type: str) -> Mino:
     match type:
-        case 'I':
-            return IMino()
-        case 'J':
-            return JMino()
-        case 'L':
-            return LMino()
-        case 'Z':
-            return ZMino()
-        case 'S':
-            return SMino()
-        case 'T':
-            return TMino()
-        case 'O':
-            return OMino()
+        case 'I': return IMino()
+        case 'J': return JMino()
+        case 'L': return LMino()
+        case 'Z': return ZMino()
+        case 'S': return SMino()
+        case 'T': return TMino()
+        case 'O': return OMino()
 
 def rotate(point: Position) -> Position:
     """Rotate point 90 degrees about origin"""
     return Position(point.y, -point.x)
 
 def test():
-    a = create_mino('Z')
+    a = create_mino('I')
     print(a)
-    a.translate((-5,3))
+    print(a.blocks)
+    a.rotate_cw()
+    a.rotate_cw()
     print(a)
+    print(a.blocks)
 
 if __name__ == '__main__':
     test()
