@@ -1,4 +1,6 @@
 from position import Position
+from lineclear import LineClear
+from mino import Mino
 
 ROWS = 20
 COLUMNS = 10
@@ -52,7 +54,28 @@ class BoardManager:
     def __init__(self, board: Board) -> None:
         self.board = board
 
-    def find_cleared_lines(self) -> list[int]:
+    def find_and_clear_lines(self, mino: Mino) -> LineClear | None:
+        filled_lines = self.find_filled_lines()
+        if filled_lines:
+            tspin = self.detect_tspin(mino)
+            num_lines_cleared = len(filled_lines)
+            self.clear_lines(filled_lines)
+            return LineClear(num_lines_cleared, tspin)
+        
+        return None
+
+    def detect_tspin(self, mino: Mino) -> bool:
+        # Returns true if the line clear was a t spin
+        if mino.type != 'T':
+            return False
+        corners = get_corners(mino.center)
+        occupied_corners = 0 
+        for corner in corners:
+            if (is_occupied(corner, self.board)):
+                occupied_corners += 1
+        return occupied_corners == 3
+
+    def find_filled_lines(self) -> list[int]:
         cleared_lines = []
         for i, row in enumerate(self.board.board_arr):
             if is_row_filled(row):
@@ -71,7 +94,29 @@ class BoardManager:
     def add_row(self) -> None:
         add_empty_row(self.board.board_arr)
 
+    def add_mino(self, mino: Mino) -> None:
+        for block in mino.blocks:
+            self.board.set_cell_colour(block, mino.colour)
 
+def get_corners(position: Position) -> list[Position]:
+    corners = []
+    offsets = [
+        Position(-1,1),
+        Position(-1,-1),
+        Position(1,1),
+        Position(1,-1)
+    ]
+    for offset in offsets:
+        corners.append(position + offset)
+
+def is_occupied(position: Position, board: Board):
+    # For t spin detection, the walls and floor of board counts as filled blocks
+    if position.x < 0 or position.x >= 10:
+        return True
+    if position.y < 0:
+        return True
+
+    return board.is_cell_occupied(position)
 
 def init_board(board):
     for _ in range(ROWS):
@@ -88,6 +133,7 @@ def is_row_filled(row) -> bool:
         if is_empty(cell):
             return False
     return True
+
 
 def test():
     board = Board()
@@ -106,7 +152,7 @@ def test():
         board.set_cell_colour(cell, 'yellow')
     print(board)
     bm = BoardManager(board)
-    print(cl := bm.find_cleared_lines())
+    print(cl := bm.find_filled_lines())
     bm.clear_lines(cl)
     print(board)
 

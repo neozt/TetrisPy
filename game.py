@@ -3,6 +3,7 @@ from board import Board, BoardManager
 from pieceholder import Hold, NoHeldMinoException
 from piecequeue import PieceQueue
 from piecemovement import PieceMovement
+from lineclear import LineClear
 
 from dataclasses import dataclass, asdict
 
@@ -21,11 +22,19 @@ class Game:
     def __init__(self, gravity = 30):
         self.board: Board = Board()
         self.board_manager: BoardManager = BoardManager(self.board)
-        self.hold: Hold = Hold()
         self.queue: PieceQueue = PieceQueue()
+        self.hold: Hold = Hold()
         self.move_handler: PieceMovement = PieceMovement()
+        self.current_mino: Mino = self.spawn_mino()
+        self.previous_mino: Mino = None
+
         self.ticks_since_last_drop = 0
         self.gravity = gravity
+
+        self.total_clears: list[LineClear] = []
+
+        self.observers = []
+        self.line_clear_observer = []
 
     def update(self, input: GameInput):
         # Handle user input
@@ -33,11 +42,16 @@ class Game:
         # Handle vertical movement
         self.handle_vertical_movement(input)
         # Handle line clears
-        self.handle_line_clears()
+        self.board_manager.find_and_clear_lines(self.current_mino)
         # Handle death
 
     def handle_line_clears(self):
-        cleared_lines = self.board_manager.find_cleared_lines()
+        # Check if there are any lines that need to be cleared
+        line_clear = self.board_manager.find_and_clear_lines(self.previous_mino) 
+        
+        if line_clear is not None:
+            self.append_line_clear(line_clear)
+            self.notify_line_clear_observers()
 
 
     def perform_user_movements(self, input: GameInput):
@@ -46,36 +60,42 @@ class Game:
             self.perform_move(key, value)
 
     def perform_move(self, input_type: str, value: int | bool) -> None:
+        requires_update = False
         match input_type:
             case 'left':
                 for _ in range(value):
-                    self.move_handler.move_left(self.mino, self.board)
+                    requires_update = self.move_handler.move_left(self.current_mino, self.board)
             case 'right':
                 for _ in range(value):
-                    self.move_handler.move_right(self.mino, self.board)
+                    requires_update = self.move_handler.move_right(self.current_mino, self.board)
             case 'rotate_cw':
                 for _ in range(value):
-                    self.move_handler.rotate_cw(self.mino, self.board)
+                    requires_update = self.move_handler.rotate_cw(self.current_mino, self.board)
             case 'rotate_ccw':
                 for _ in range(value):
-                    self.move_handler.rotate_ccw(self.mino, self.board)
+                    requires_update = self.move_handler.rotate_ccw(self.current_mino, self.board)
             case 'hold':
                 if value:
-                    self.hold_mino()
+                    requires_update = self.hold_mino()
+        
+        if requires_update:
+            self.notify_observers()
 
-    def hold_mino(self):
+    def hold_mino(self) -> bool:
         try: 
-            previously_held: Mino = self.hold.hold_mino(self.mino)
-            if previously_held is None:
-                self.spawn_mino()
-            else:
-                self.mino = previously_held
-
+            previously_held = self.hold.hold_mino(self.current_mino)
         except NoHeldMinoException:
-            pass
+            return False
 
-    def spawn_mino(self):
-        self.mino = self.queue.pop()
+        if previously_held is None:
+            self.spawn_mino()
+        else:
+            self.current_mino = previously_held
+        return True
+
+
+    def spawn_mino(self) -> Mino:
+        return self.queue.pop()
 
     def handle_vertical_movement(self, input: GameInput) -> None:
         if input.hard_drop:
@@ -88,13 +108,15 @@ class Game:
             if self.gravity_pulls():
                 self.drop()
 
-    def hard_drop(self) -> None:
-        self.move_handler.hard_drop(self.mino, self.board)
-        self.spawn_mino()
+    def hard_drop(self) -> None: 
+        self.move_handler.hard_drop(self.current_mino, self.board) # Move mino to bottom
+        self.board_manager.add_mino(self.current_mino) # Mino becomes part of board now
+        self.previous_mino = self.current_mino  # Mino is no longer current
+        self.current_mino = self.spawn_mino()   # Spawn new mino
         self.reset_gravity_ticks()
 
     def drop(self) -> None:
-        self.move_handler.move_down(self.mino, self.board)
+        self.move_handler.move_down(self.current_mino, self.board)
         self.reset_gravity_ticks()
     
     def reset_gravity_ticks(self) -> None:
@@ -102,6 +124,27 @@ class Game:
 
     def gravity_pulls(self) -> bool:
         return self.ticks_since_last_drop > self.gravity
+
+    @property
+    def current_score(self) -> int:
+        return sum([clear.score for clear in self.total_clears])
+
+    def append_line_clear(self, line_clear: LineClear) -> None:
+        self.total_clears.append(line_clear)
+
+    def notify_line_clear_observers(self) -> None:
+        for observer in self.line_clear_observers:
+            observer.update_line_clear(self)
+
+    def register_line_clear_observer(self, observer) -> None:
+        self.line_clear_observers.append(observer)
+
+    def notify_observers(self) -> None:
+        for observer in self.line_clear_observers:
+            observer.update(self)
+
+    def register_observer(self, observer) -> None:
+        self.observers.append(observer)
             
 
 def test():
