@@ -21,11 +21,11 @@ def is_valid_position(mino: Mino, board: Board):
 
     return True
 
-def undo_if_invalid(fn) -> bool:
+def undo_if_invalid(fn):
     # Decorator to save position of mino before performing move 
     # And restores the mino back to the original position if the move results in an invalid mino position
     # Returns if the move was successful or not
-    def wrappedfn(*args, **kwargs):
+    def wrappedfn(*args, **kwargs) -> bool:
         mino = args[1]
         board = args[2]
         original_center = copy(mino.center)
@@ -40,65 +40,62 @@ def undo_if_invalid(fn) -> bool:
             
     return wrappedfn
 
-class MoveHandler:
+class PieceMovement:
     def __init__(self, kick_table: KickTable = KickTable()) -> None:
         self.kick_table = kick_table
         
     @undo_if_invalid
-    def move_left(self, mino: Mino, board: Board) -> bool:
+    def move_left(self, mino: Mino, board: Board):
         mino.left()
 
     @undo_if_invalid
-    def move_right(self, mino: Mino, board: Board) -> bool:
+    def move_right(self, mino: Mino, board: Board):
         mino.right()
 
     @undo_if_invalid
-    def move_down(self, mino: Mino, board: Board) -> bool:
+    def move_down(self, mino: Mino, board: Board):
         mino.down()
 
     def hard_drop(self, mino: Mino, board: Board) -> None:
         # Move mino down until no longer possible
-        dropped = self.move_mino_down(mino, board)
+        dropped = self.move_down(mino, board)
         while (dropped):
-            dropped = self.move_mino_down(mino, board)
+            dropped = self.move_down(mino, board)
 
 
     def rotate_cw(self, mino: Mino, board: Board) -> bool:
-        return self.rotate(mino, board, 'cw')
+        return self.rotate_with_kicks(mino, board, 'cw')
 
     def rotate_ccw(self, mino: Mino, board: Board) -> bool:
-        return self.rotate(mino, board, 'ccw')
+        return self.rotate_with_kicks(mino, board, 'ccw')
 
-    def rotate(self, mino: Mino, board: Board, direction: str) -> bool:
-        current_orientation = mino.orientation
-        if direction == 'cw':
-            target_orientation  = current_orientation.clockwise()
-        elif direction == 'ccw':
-            target_orientation = current_orientation.counterclockwise()
+    def rotate_with_kicks(self, mino: Mino, board: Board, direction: str) -> bool:
+        current_orientation: Orientation = mino.orientation
+        target_orientation: Orientation = current_orientation.clockwise() if direction == 'cw' else current_orientation.counterclockwise()
             
         # Try each kicks in the kick table in sequence until the first valid kick is found
         kicks = self.kick_table.get_kicks(current_orientation.value, target_orientation.value, mino.type)
         for kick in kicks:
-            success = self.try_rotate(mino, board, direction, kick)
+            success = self.rotate_with_kick(mino, board, direction, kick)
             if success:
                 break
         return success
 
     @undo_if_invalid
-    def try_rotate(self, mino: Mino, board: Board, direction: str, offset: tuple[int, int]) -> bool:
+    def rotate_with_kick(self, mino: Mino, board: Board, direction: str, offset: tuple[int, int]) -> bool:
         # Rotates based on direction
         if direction == 'cw':
             mino.rotate_cw()
         elif direction == 'ccw':
             mino.rotate_ccw()
 
-        # "Kick" the mino by translated based on the offset
+        # "Kick" the mino by translating based on the offset
         mino.translate(offset)
 
     
 
 def test():
-    mover = MoveHandler()
+    mover = PieceMovement()
     mino = mn.create_mino('Z')
     board = Board()
     print(mino)

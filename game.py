@@ -1,114 +1,114 @@
-import pygame
-from piecequeue import PieceQueue
 from mino import Mino
-from board import Board
-from renderer import Renderer
-from movehandler import MovementHandler
-from hold import Hold
+from board import Board, BoardManager
+from pieceholder import Hold, NoHeldMinoException
+from piecequeue import PieceQueue
+from piecemovement import PieceMovement
+
+from dataclasses import dataclass, asdict
+
+@dataclass
+class GameInput:
+    left: int = 0
+    right: int = 0
+    rotate_cw: int = 0
+    rotate_ccw: int = 0
+    rotate_180: int = 0
+    soft_drop: bool = False
+    hard_drop: bool = False
+    hold: bool = False
 
 class Game:
-    SOFT_DROP_MULTIPLIER = 4
-
     def __init__(self, gravity = 30):
-        self.board = Board()
-        self.queue = PieceQueue(self.board)
-        self.mino = self.queue.pop()
-        self.mino_holder = Hold(self)
-        self.move_handler = MovementHandler(self)
-        self.running = True
-        self.gravity = gravity     # Number of frames to wait before mino move down 1 block
-        self.double_gravity = self.gravity // Game.SOFT_DROP_MULTIPLIER
-        self.soft_dropping = False
-        self.tick_counter = 0
+        self.board: Board = Board()
+        self.board_manager: BoardManager = BoardManager(self.board)
+        self.hold: Hold = Hold()
+        self.queue: PieceQueue = PieceQueue()
+        self.move_handler: PieceMovement = PieceMovement()
+        self.ticks_since_last_drop = 0
+        self.gravity = gravity
 
-    def handle_gravity(self):
-        self.move_handler.handle_gravity()
+    def update(self, input: GameInput):
+        # Handle user input
+        self.perform_user_movements(input)
+        # Handle vertical movement
+        self.handle_vertical_movement(input)
+        # Handle line clears
+        self.handle_line_clears()
+        # Handle death
 
-    def check_and_handle_line_clears(self):
-        cleared_lines = self.board.find_cleared_lines()
-        if cleared_lines:
-            self.board.clear_lines(cleared_lines)
-        return cleared_lines
+    def handle_line_clears(self):
+        cleared_lines = self.board_manager.find_cleared_lines()
 
-    def stop_game(self):
-        print("Game over")
-        self.running = False
 
-    def check_death(self):
-        # Death occurs when mino is in an occupied position
-        # This will happen only during spawning
-        death = self.mino.check_collision()
-        return death
+    def perform_user_movements(self, input: GameInput):
+        """Handle user inputs for horizontal movement, holding, and rotation"""
+        for key, value in asdict(input).items():
+            self.perform_move(key, value)
 
-    def move_mino_left(self):
-        self.mino.move('left')
+    def perform_move(self, input_type: str, value: int | bool) -> None:
+        match input_type:
+            case 'left':
+                for _ in range(value):
+                    self.move_handler.move_left(self.mino, self.board)
+            case 'right':
+                for _ in range(value):
+                    self.move_handler.move_right(self.mino, self.board)
+            case 'rotate_cw':
+                for _ in range(value):
+                    self.move_handler.rotate_cw(self.mino, self.board)
+            case 'rotate_ccw':
+                for _ in range(value):
+                    self.move_handler.rotate_ccw(self.mino, self.board)
+            case 'hold':
+                if value:
+                    self.hold_mino()
 
-    def move_mino_right(self):
-        self.mino.move('right')
-
-    def move_mino_down(self):
-        self.mino.move('down')
-
-    def rotate_mino_cw(self):
-        self.mino.rotate_cw()
-
-    def rotate_mino_ccw(self):
-        self.mino.rotate_ccw()        
-
-    def rotate_mino_180(self):
-        pass
-
-    def harddrop_mino(self):
-        self.mino.hard_drop()
-        self.board.add_mino_to_board(self.mino)
-        self.get_next_mino()
-        self.mino_holder.enable_hold()
-
-    def softdrop_mino(self):
-        self.mino.move('down')
-
-    def hold(self):
-        try:
-            new_mino = self.mino_holder.hold_mino(self.mino)
-            if new_mino is not None:
-                self.mino = new_mino
+    def hold_mino(self):
+        try: 
+            previously_held: Mino = self.hold.hold_mino(self.mino)
+            if previously_held is None:
+                self.spawn_mino()
             else:
-                self.get_next_mino()
-            self.mino_holder.disable_hold()
-        except Exception as e:
+                self.mino = previously_held
+
+        except NoHeldMinoException:
             pass
 
-    def get_next_mino(self):
+    def spawn_mino(self):
         self.mino = self.queue.pop()
 
-    def perform_moves(self):
-        for move, count in self.move_handler.move_count.items():
-            for i in range(count):
-                self.perform_move(move)
+    def handle_vertical_movement(self, input: GameInput) -> None:
+        if input.hard_drop:
+            self.hard_drop()
+        elif input.soft_drop:
+            self.drop()
+        else:
+            # Handle gravity
+            self.ticks_since_last_drop += 1
+            if self.gravity_pulls():
+                self.drop()
 
-    def perform_move(self, move):
-        match(move):
-            case 'left':
-                self.move_mino_left()
-            case 'right':
-                self.move_mino_right()
-            case 'rotatecw':
-                self.rotate_mino_cw()
-            case 'rotateccw':
-                self.rotate_mino_ccw()
-            case 'rotate180':
-                self.rotate_mino_180()
-            case 'down':
-                self.softdrop_mino()
-            case 'harddrop':
-                self.harddrop_mino()
-            case 'hold':
-                self.hold()
+    def hard_drop(self) -> None:
+        self.move_handler.hard_drop(self.mino, self.board)
+        self.spawn_mino()
+        self.reset_gravity_ticks()
+
+    def drop(self) -> None:
+        self.move_handler.move_down(self.mino, self.board)
+        self.reset_gravity_ticks()
     
+    def reset_gravity_ticks(self) -> None:
+        self.ticks_since_last_drop = 0
 
-    def process_inputs(self, keys):
-        self.move_handler.process_inputs(keys)
+    def gravity_pulls(self) -> bool:
+        return self.ticks_since_last_drop > self.gravity
+            
 
-    def tick(self):
-        self.move_handler.tick()
+def test():
+    a = GameInput()
+    for key, value in asdict(a).items():
+        print(key)
+        print(value)
 
+if __name__ == '__main__':
+    test()
