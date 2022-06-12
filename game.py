@@ -46,21 +46,6 @@ class Game:
         # Handle death
         self.check_and_handle_death()
 
-    def check_and_handle_death(self):
-        dead = self.check_death()
-        if dead:
-            self.notify_death_observers()
-            self.stop()
-
-    def check_death(self):
-        for block in self.current_mino.blocks:
-            if self.board.is_cell_occupied(block):
-                return True
-        return False
-
-    def stop(self):
-        self.alive = False
-
     def handle_line_clears(self):
         # Check if there are any lines that need to be cleared
         line_clear = self.board_manager.find_and_clear_lines(self.previous_mino) 
@@ -68,7 +53,6 @@ class Game:
         if line_clear is not None:
             self.append_line_clear(line_clear)
             self.notify_line_clear_observers()
-
 
     def perform_user_movements(self, input: GameInput):
         """Handle user inputs for horizontal movement, holding, and rotation"""
@@ -129,16 +113,33 @@ class Game:
         self.previous_mino = self.current_mino  # Mino is no longer current
         self.current_mino = self.spawn_mino()   # Spawn new mino
         self.reset_gravity_ticks()
+        self.notify_observers()
 
     def drop(self) -> None:
         self.move_handler.move_down(self.current_mino, self.board)
         self.reset_gravity_ticks()
+        self.notify_observers()
     
     def reset_gravity_ticks(self) -> None:
         self.ticks_since_last_drop = 0
 
     def gravity_pulls(self) -> bool:
         return self.ticks_since_last_drop > self.gravity
+
+    def check_and_handle_death(self):
+        dead = self.check_death()
+        if dead:
+            self.notify_death_observers()
+            self.stop()
+
+    def check_death(self):
+        for block in self.current_mino.blocks:
+            if self.board.is_cell_occupied(block):
+                return True
+        return False
+
+    def stop(self):
+        self.alive = False
 
     @property
     def current_score(self) -> int:

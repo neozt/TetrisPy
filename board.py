@@ -23,7 +23,7 @@ class Board:
         for row in reversed(self.board_arr):
             board += '|'
             for cell in row:
-                board += cell.center(8)
+                board += cell.center(12)
             board += '|' + '\n'
         return divider + '\n' + board + divider
 

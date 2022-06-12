@@ -119,7 +119,7 @@ class IMino(Mino):
 @dataclass
 class OMino(Mino):
     center: GridPosition = GridPosition(5, 19)
-    colour: str = 'light blue'
+    colour: str = 'yellow'
     type: str = 'O'
 
     @property 
