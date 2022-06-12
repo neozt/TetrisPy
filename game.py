@@ -28,13 +28,13 @@ class Game:
         self.current_mino: Mino = self.spawn_mino()
         self.previous_mino: Mino = None
 
+        self.alive = True
         self.ticks_since_last_drop = 0
         self.gravity = gravity
 
         self.total_clears: list[LineClear] = []
 
         self.observers = []
-        self.line_clear_observer = []
 
     def update(self, input: GameInput):
         # Handle user input
@@ -44,6 +44,22 @@ class Game:
         # Handle line clears
         self.board_manager.find_and_clear_lines(self.current_mino)
         # Handle death
+        self.check_and_handle_death()
+
+    def check_and_handle_death(self):
+        dead = self.check_death()
+        if dead:
+            self.notify_death_observers()
+            self.stop()
+
+    def check_death(self):
+        for block in self.current_mino.blocks:
+            if self.board.is_cell_occupied(block):
+                return True
+        return False
+
+    def stop(self):
+        self.alive = False
 
     def handle_line_clears(self):
         # Check if there are any lines that need to be cleared
@@ -93,7 +109,6 @@ class Game:
             self.current_mino = previously_held
         return True
 
-
     def spawn_mino(self) -> Mino:
         return self.queue.pop()
 
@@ -132,20 +147,22 @@ class Game:
     def append_line_clear(self, line_clear: LineClear) -> None:
         self.total_clears.append(line_clear)
 
-    def notify_line_clear_observers(self) -> None:
-        for observer in self.line_clear_observers:
-            observer.update_line_clear(self)
-
-    def register_line_clear_observer(self, observer) -> None:
-        self.line_clear_observers.append(observer)
-
-    def notify_observers(self) -> None:
-        for observer in self.line_clear_observers:
-            observer.update(self)
-
     def register_observer(self, observer) -> None:
         self.observers.append(observer)
-            
+
+    def notify_observers(self) -> None:
+        for observer in self.observers:
+            observer.update(self)
+
+    def notify_line_clear_observers(self) -> None:
+        for observer in self.observers:
+            observer.update(self, 'line clear')
+
+    def notify_death_observers(self) -> None:
+        for observer in self.observers:
+            observer.update(self, 'death')
+
+
 
 def test():
     a = GameInput()
