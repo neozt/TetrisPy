@@ -144,6 +144,7 @@ class OMino(Mino):
 class JMino(Mino):
     center: Position = Position(4, 19)
     colour = 'blue'
+    type: str = 'T'
 
     @property
     def normalised_positions(self) -> list[Position]:

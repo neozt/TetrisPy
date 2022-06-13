@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from mino import Mino
-import mino
+import mino as mn
 
 class HoldDisabledException(Exception):
     pass
@@ -13,7 +13,7 @@ class Hold:
 
     def hold_mino(self, mino: Mino) -> Mino:
         if self.allow_hold:
-            held_mino = mino.create_mino(self.held_mino.type)  # Create a new copy of the same mino type so that it spawns in the default position
+            held_mino = mn.create_mino(self.held_mino.type)  # Create a new copy of the same mino type so that it spawns in the default position
             self.held_mino = mino   # Replace outgoing mino with new mino
             self.disable_hold()     # Disable hold until returned mino is place to prevent indefinite cycling between held minos
             return held_mino

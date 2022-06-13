@@ -4,20 +4,11 @@ from pieceholder import Hold, HoldDisabledException
 from piecequeue import PieceQueue
 from piecemovement import PieceMovement
 from lineclear import LineClear
+from inputs import GameInput
 
 from dataclasses import dataclass, asdict
 from enum import Enum, auto
 
-@dataclass
-class GameInput:
-    left: int = 0
-    right: int = 0
-    rotate_cw: int = 0
-    rotate_ccw: int = 0
-    rotate_180: int = 0
-    soft_drop: bool = False
-    hard_drop: bool = False
-    hold: bool = False
 
 class EventType(Enum):
     NORMAL = auto()
@@ -67,31 +58,30 @@ class Game:
         for key, value in asdict(input).items():
             self.perform_move(key, value)
 
-    def perform_move(self, input_type: str, value: int | bool) -> None:
+    def perform_move(self, input_type: str, perform: bool) -> None:
+        if perform == False:
+            return 
+
         requires_update = False
         match input_type:
-            case 'left':
-                for _ in range(value):
-                    success = self.move_handler.move_left(self.current_mino, self.board)
-                    if success:
-                        requires_update = True
-            case 'right':
-                for _ in range(value):
-                    success = self.move_handler.move_right(self.current_mino, self.board)
-                    if success:
-                        requires_update = True
+            case 'move_left':
+                success = self.move_handler.move_left(self.current_mino, self.board)
+                if success:
+                    requires_update = True
+            case 'move_right':
+                success = self.move_handler.move_right(self.current_mino, self.board)
+                if success:
+                    requires_update = True
             case 'rotate_cw':
-                for _ in range(value):
-                    success = self.move_handler.rotate_cw(self.current_mino, self.board)
-                    if success:
-                        requires_update = True
+                success = self.move_handler.rotate_cw(self.current_mino, self.board)
+                if success:
+                    requires_update = True
             case 'rotate_ccw':
-                for _ in range(value):
-                    success = self.move_handler.rotate_ccw(self.current_mino, self.board)
-                    if success:
-                        requires_update = True
+                success = self.move_handler.rotate_ccw(self.current_mino, self.board)
+                if success:
+                    requires_update = True
             case 'hold':
-                if value:
+                if perform:
                     requires_update = self.hold_mino()
         
         if requires_update:
@@ -176,17 +166,15 @@ class Game:
         for observer in self.observers:
             observer.update(self, event)
 
+def foo(mino: Mino):
+    mino.left()
 
 def test():
     game = Game()
-    game.add_line_clear(LineClear(4,False))
-    game.add_line_clear(LineClear(4,False))
-    game.add_line_clear(LineClear(4,False))
-    game.add_line_clear(LineClear(3,True))
-    game.add_line_clear(LineClear(1, False))
-    print(game.current_score)
-    print(game.line_clears)
-    print(game.previous_line_clear)
+    a = GameInput(move_left=True, move_right=False, rotate_cw=True, rotate_ccw=False, rotate_180=False, hold=False, soft_drop=False, hard_drop=False)
+    print(game.current_mino)
+    game.update(a)
+    print(game.current_mino)
 
 if __name__ == '__main__':
     test()
