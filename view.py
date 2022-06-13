@@ -15,7 +15,7 @@ class View:
         print(game.board)
 
     def render_line_clear(self, game: Game):
-        print(game.total_clears[-1])
+        print(game.line_clears[-1])
         self.render_game(game)
 
     def render_death(self, game: Game):
