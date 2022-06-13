@@ -46,6 +46,10 @@ def require_auto_shift(ticks: int, arr: int, das: int) -> bool:
         return ((ticks - das - 1) % arr ) == 0
 
 
+def softdrop_interval_passed(ticks: int, interval_in_ticks: int) -> bool:
+    return ticks % interval_in_ticks == 0
+
+
 @dataclass
 class InputProcessor:
     """
@@ -56,6 +60,7 @@ class InputProcessor:
     arr: int = 1
     softdrop_gravity: int = 5
 
+    # Variables to remember state
     rotate_cw_held: bool = field(default = False, init = False)
     rotate_ccw_held: bool = field(default = False, init = False)
     hold_held: bool = field(default = False, init = False)
@@ -141,7 +146,7 @@ class InputProcessor:
         if not soft:
             self.softdrop_held_for = 0
         else:
-            softdrop = 1 if (self.softdrop_held_for % self.softdrop_gravity == 0) else  0
+            softdrop = 1 if softdrop_interval_passed(self.softdrop_held_for, self.softdrop_gravity) else  0
             self.softdrop_held_for += 1
 
         if not hard: 
@@ -151,6 +156,8 @@ class InputProcessor:
             self.harddrop_held = True
 
         return softdrop, harddrop
+
+
 
             
 def test():
