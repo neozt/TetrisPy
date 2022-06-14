@@ -11,7 +11,13 @@ class Hold:
     held_mino: Mino = None
     allow_hold: bool = True
 
-    def hold_mino(self, mino: Mino) -> Mino:
+    def hold_mino(self, mino: Mino) -> Mino | None:
+        # Handle first hold event specailly since there is no mino to be returned
+        if self.held_mino is None:
+            self.held_mino = mino
+            self.disable_hold()
+            return None
+
         if self.allow_hold:
             held_mino = mn.create_mino(self.held_mino.type)  # Create a new copy of the same mino type so that it spawns in the default position
             self.held_mino = mino   # Replace outgoing mino with new mino

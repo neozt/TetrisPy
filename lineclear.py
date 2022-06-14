@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-LINES_TO_WORD = {1: 'Single', 2: 'Double', 3: 'Triple', 4: 'Tetrs'}
+LINES_TO_WORD = {1: 'Single', 2: 'Double', 3: 'Triple', 4: 'Tetris'}
 
 @dataclass(frozen = True)
 class LineClear:

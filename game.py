@@ -41,14 +41,13 @@ class Game:
         # Handle vertical movement
         self.handle_vertical_movement(input)
         # Handle line clears
-        self.board_manager.find_and_clear_lines(self.current_mino)
+        self.handle_line_clears()
         # Handle death
         self.check_and_handle_death()
 
     def handle_line_clears(self):
         # Check if there are any lines that need to be cleared
-        line_clear = self.board_manager.find_and_clear_lines(self.previous_mino) 
-        
+        line_clear = self.board_manager.find_and_clear_lines(self.previous_mino)
         if line_clear is not None:
             self.add_line_clear(line_clear)
             self.notify_observers(EventType.LINE_CLEAR)
@@ -81,8 +80,7 @@ class Game:
                 if success:
                     requires_update = True
             case 'hold':
-                if perform:
-                    requires_update = self.hold_mino()
+                requires_update = self.hold_mino()
         
         if requires_update:
             self.notify_observers()
@@ -100,7 +98,7 @@ class Game:
         return True
 
     def spawn_mino(self) -> None:
-        self.previous_line_clear = self.current_mino
+        self.previous_mino = self.current_mino
         self.current_mino = self.queue.pop()
 
     def handle_vertical_movement(self, input: GameInput) -> None:

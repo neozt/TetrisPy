@@ -27,6 +27,14 @@ class Board:
             board += '|' + '\n'
         return divider + '\n' + board + divider
 
+    @property
+    def rows(self) -> int:
+        return ROWS
+    
+    @property
+    def columns(self) -> int:
+        return COLUMNS
+
     def set_cell_colour(self, cell: Position, colour: str) -> None:
         try:
             self.board_arr[cell.y][cell.x] = colour
@@ -73,7 +81,7 @@ class BoardManager:
         for corner in corners:
             if (is_occupied(corner, self.board)):
                 occupied_corners += 1
-        return occupied_corners == 3
+        return occupied_corners >= 3
 
     def find_filled_lines(self) -> list[int]:
         cleared_lines = []
@@ -108,6 +116,7 @@ def get_corners(position: Position) -> list[Position]:
     ]
     for offset in offsets:
         corners.append(position + offset)
+    return corners
 
 def is_occupied(position: Position, board: Board):
     # For t spin detection, the walls and floor of board counts as filled blocks

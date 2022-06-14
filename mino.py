@@ -78,7 +78,7 @@ class Mino(ABC):
 @dataclass
 class IMino(Mino):
     center: GridPosition = GridPosition(5, 19)
-    colour: str = 'light blue'
+    colour: str = 'blue'
     type: str = 'I'
 
     @property 
@@ -143,7 +143,7 @@ class OMino(Mino):
 @dataclass
 class JMino(Mino):
     center: Position = Position(4, 19)
-    colour = 'blue'
+    colour = 'dark blue'
     type: str = 'T'
 
     @property

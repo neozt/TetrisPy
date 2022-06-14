@@ -1,21 +1,38 @@
-from game import Game, GameInput
+import pygame
+from game import Game
+from inputs import Input, UserInput, InputProcessor
 from view import View
-from input import InputProcessor, UserInput
+
+from pygame.locals import *
 
 def main():
-    # game = Game()
-    # view = View()
-    # game.register_observer(view)
-    # hard_drop = GameInput(hard_drop = True)
-    # left = GameInput(left = 1)
-    # rotate = GameInput(rotate_cw = 1)
-    # soft_drop = GameInput(soft_drop = True)
+    game = Game()
+    view = View()
+    game.register_observer(view)
+    input_processor = InputProcessor()
 
-    # game.update(soft_drop)
-    # game.update(soft_drop)
-    # game.update(soft_drop)
-    # game.update(soft_drop)
-    # game.update(hard_drop)
+    pygame.init()
+    clock = pygame.time.Clock()
+
+    view.render_game(game)
+    while game.alive:
+        # Handle termination
+        for event in pygame.event.get():
+            if event.type == KEYDOWN and event.key == K_ESCAPE:
+                game.alive = False
+            elif event.type == QUIT:
+                game.alive = False
+
+        inputs  = input_processor.process_inputs(
+            UserInput(pygame.key.get_pressed())
+        )
+        game.update(inputs)
+
+        clock.tick(60)
+
+    pygame.quit()
+        
+
 
     
 

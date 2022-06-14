@@ -1,3 +1,4 @@
+import pygame
 from pygame.locals import *
 from typing import ClassVar
 from enum import Enum
@@ -30,15 +31,15 @@ class GameInput(Input):
 
 @dataclass
 class UserInput(Input):
-    def __init__(self, inputs: dict[int, bool]):
-        self.move_left = inputs.get(MOVE_LEFT, False)
-        self.move_right = inputs.get(MOVE_RIGHT, False)
-        self.rotate_cw = inputs.get(ROTATE_CW, False)
-        self.rotate_ccw = inputs.get(ROTATE_CCW, False)
-        self.rotate_180 = inputs.get(ROTATE_180, False)
-        self.hold = inputs.get(HOLD, False)
-        self.soft_drop = inputs.get(SOFT_DROP, False)
-        self.hard_drop = inputs.get(HARD_DROP, False)
+    def __init__(self, inputs: list[bool]):
+        self.move_left = inputs[K_LEFT]
+        self.move_right = inputs[K_RIGHT]
+        self.rotate_cw = inputs[K_UP]
+        self.rotate_ccw = inputs[K_z]
+        self.rotate_180 = inputs[K_a]
+        self.hold = inputs[K_c]
+        self.soft_drop = inputs[K_DOWN]
+        self.hard_drop = inputs[K_SPACE]
         
 
 def require_auto_shift(ticks: int, arr: int, das: int) -> bool:
@@ -79,14 +80,14 @@ class InputProcessor:
         hold = self.handle_hold(inputs.hold)
         soft_drop, hard_drop = self.handle_drops(inputs.soft_drop, inputs.hard_drop)
         
-        return GameInput(move_left, move_right, rotate_cw, rotate_ccw, rotate_180, soft_drop, hard_drop, hold)
+        return GameInput(move_left, move_right, rotate_cw, rotate_ccw,rotate_180, hold, soft_drop, hard_drop)
 
 
     def handle_horizontal_inputs(self, left_pressed: bool, right_pressed: bool) -> tuple[bool, bool]:
         if not left_pressed and not right_pressed:
             # Reset to neutral state
             self.horizontal_direction = 0
-        left = right = True
+        left = right = False
         if left_pressed:
             left = self.handle_left_input()
         if right_pressed:
@@ -165,44 +166,9 @@ class InputProcessor:
 
 
 def test():
-    processor = InputProcessor(
-        das = 5,
-        arr = 4
-    )
 
-    input = {
-        MOVE_LEFT: False,
-        MOVE_RIGHT: False,
-        ROTATE_CW: False,
-        ROTATE_180: False,
-        ROTATE_CCW: False,
-        HARD_DROP: False,
-        SOFT_DROP: False,
-        HOLD: False
-    }
-
-    softdrop = input.copy()
-    softdrop[SOFT_DROP] = True
-
-    harddrop = input.copy()
-    harddrop[HARD_DROP] = True
-
-    input = UserInput(input)
-    softdrop = UserInput(softdrop)
-    harddrop = UserInput(harddrop)
-
-    def foo():
-        print(processor.process_inputs(softdrop))
-        # print(processor)
-    def bar():
-        print(processor.process_inputs(harddrop))
-
-    def baz():
-        print(processor.process_inputs(input))
-    foo()
-
-    # print(GameInput())
-
+    # print(UserInput(inputs))
+    return
 
 
 if __name__ == '__main__':
