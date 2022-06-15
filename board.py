@@ -7,12 +7,14 @@ COLUMNS = 10
 EMPTY = 'grey'
 EMPTY_ROW = [EMPTY for x in range(COLUMNS)]
 
+
 class Board:
     """
     Class that holds board state in a 10 by 20 array. 
     (0,0) denotes the bottom left corner, (10,20) denotes the top right corner.
     The elements in the array represents the colour of the corresponding cell.
     """
+
     def __init__(self) -> None:
         self.board_arr = list()
         init_board(self.board_arr)
@@ -30,7 +32,7 @@ class Board:
     @property
     def rows(self) -> int:
         return ROWS
-    
+
     @property
     def columns(self) -> int:
         return COLUMNS
@@ -39,19 +41,20 @@ class Board:
         try:
             self.board_arr[cell.y][cell.x] = colour
         except IndexError:
-            raise ValueError(f'Cell should be within (0,0) -> ({ROWS-1},{COLUMNS-1})')
-            
+            raise ValueError(
+                f'Cell should be within (0,0) -> ({ROWS-1},{COLUMNS-1})')
+
     def get_cell_colour(self, cell: Position) -> None:
         try:
             return self.board_arr[cell.y][cell.x]
         except IndexError:
-            raise ValueError(f'Cell should be within (0,0) -> ({ROWS-1},{COLUMNS-1})')
+            raise ValueError(
+                f'Cell should be within (0,0) -> ({ROWS-1},{COLUMNS-1})')
 
     def is_cell_occupied(self, cell: Position) -> bool:
-        if not 0 <= cell.x < COLUMNS or not 0 <= cell.y < ROWS: 
+        if not 0 <= cell.x < COLUMNS or not 0 <= cell.y < ROWS:
             return False
         return not is_empty(self.get_cell_colour(cell))
-
 
 
 class BoardManager:
@@ -59,6 +62,7 @@ class BoardManager:
     Class to manage higher level board operations such as finding cleared lines and 
     performing line clears.
     """
+
     def __init__(self, board: Board) -> None:
         self.board = board
 
@@ -69,7 +73,7 @@ class BoardManager:
             num_lines_cleared = len(filled_lines)
             self.clear_lines(filled_lines)
             return LineClear(num_lines_cleared, tspin)
-        
+
         return None
 
     def detect_tspin(self, mino: Mino) -> bool:
@@ -77,7 +81,7 @@ class BoardManager:
         if mino.type != 'T':
             return False
         corners = get_corners(mino.center)
-        occupied_corners = 0 
+        occupied_corners = 0
         for corner in corners:
             if (is_occupied(corner, self.board)):
                 occupied_corners += 1
@@ -91,9 +95,9 @@ class BoardManager:
         return cleared_lines
 
     def clear_lines(self, lines: list[int]) -> None:
-        for line_no in sorted(lines, reverse = True):
+        for line_no in sorted(lines, reverse=True):
             self.remove_row(line_no)
-        for _ in range(len(lines)):    
+        for _ in range(len(lines)):
             self.add_row()
 
     def remove_row(self, row: int) -> None:
@@ -106,17 +110,19 @@ class BoardManager:
         for block in mino.blocks:
             self.board.set_cell_colour(block, mino.colour)
 
+
 def get_corners(position: Position) -> list[Position]:
     corners = []
     offsets = [
-        Position(-1,1),
-        Position(-1,-1),
-        Position(1,1),
-        Position(1,-1)
+        Position(-1, 1),
+        Position(-1, -1),
+        Position(1, 1),
+        Position(1, -1)
     ]
     for offset in offsets:
         corners.append(position + offset)
     return corners
+
 
 def is_occupied(position: Position, board: Board):
     # For t spin detection, the walls and floor of board counts as filled blocks
@@ -127,15 +133,19 @@ def is_occupied(position: Position, board: Board):
 
     return board.is_cell_occupied(position)
 
+
 def init_board(board):
     for _ in range(ROWS):
         add_empty_row(board)
 
+
 def add_empty_row(board):
     board.append(EMPTY_ROW.copy())
 
+
 def is_empty(val) -> bool:
     return val == EMPTY
+
 
 def is_row_filled(row) -> bool:
     for cell in row:
@@ -146,11 +156,11 @@ def is_row_filled(row) -> bool:
 
 def test():
     board = Board()
-    board.set_cell_colour(Position(0,0), 'red')
-    board.set_cell_colour(Position(9,2), 'green')
-    board.set_cell_colour(Position(9,19), 'green')
-    a = board.get_cell_colour(Position(0,0))
-    b = board.get_cell_colour(Position(0,11))
+    board.set_cell_colour(Position(0, 0), 'red')
+    board.set_cell_colour(Position(9, 2), 'green')
+    board.set_cell_colour(Position(9, 19), 'green')
+    a = board.get_cell_colour(Position(0, 0))
+    b = board.get_cell_colour(Position(0, 11))
     print(board)
     for i in range(COLUMNS):
         cell = Position(i, 1)
@@ -164,6 +174,7 @@ def test():
     print(cl := bm.find_filled_lines())
     bm.clear_lines(cl)
     print(board)
+
 
 if __name__ == '__main__':
     test()

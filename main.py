@@ -5,6 +5,7 @@ from view import View
 
 from pygame.locals import *
 
+
 def main():
     game = Game()
     view = View()
@@ -15,6 +16,7 @@ def main():
     clock = pygame.time.Clock()
 
     view.render_game(game)
+
     while game.alive:
         # Handle termination
         for event in pygame.event.get():
@@ -23,7 +25,7 @@ def main():
             elif event.type == QUIT:
                 game.alive = False
 
-        inputs  = input_processor.process_inputs(
+        inputs = input_processor.process_inputs(
             UserInput(pygame.key.get_pressed())
         )
         game.update(inputs)
@@ -31,12 +33,8 @@ def main():
         clock.tick(60)
 
     pygame.quit()
-        
 
-
-    
 
 if __name__ == '__main__':
-    
 
     main()

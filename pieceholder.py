@@ -3,8 +3,10 @@ from dataclasses import dataclass
 from mino import Mino
 import mino as mn
 
+
 class HoldDisabledException(Exception):
     pass
+
 
 @dataclass
 class Hold:
@@ -19,9 +21,11 @@ class Hold:
             return None
 
         if self.allow_hold:
-            held_mino = mn.create_mino(self.held_mino.type)  # Create a new copy of the same mino type so that it spawns in the default position
+            # Create a new copy of the same mino type so that it spawns in the default position
+            held_mino = mn.create_mino(self.held_mino.type)
             self.held_mino = mino   # Replace outgoing mino with new mino
-            self.disable_hold()     # Disable hold until returned mino is place to prevent indefinite cycling between held minos
+            # Disable hold until returned mino is place to prevent indefinite cycling between held minos
+            self.disable_hold()
             return held_mino
         else:
             raise HoldDisabledException('Currently not allowed to hold')

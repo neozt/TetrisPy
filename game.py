@@ -15,8 +15,9 @@ class EventType(Enum):
     LINE_CLEAR = auto()
     DEATH = auto()
 
+
 class Game:
-    def __init__(self, gravity = 30):
+    def __init__(self, gravity=30):
         self.board: Board = Board()
         self.board_manager: BoardManager = BoardManager(self.board)
         self.queue: PieceQueue = PieceQueue()
@@ -47,7 +48,8 @@ class Game:
 
     def handle_line_clears(self):
         # Check if there are any lines that need to be cleared
-        line_clear = self.board_manager.find_and_clear_lines(self.previous_mino)
+        line_clear = self.board_manager.find_and_clear_lines(
+            self.previous_mino)
         if line_clear is not None:
             self.add_line_clear(line_clear)
             self.notify_observers(EventType.LINE_CLEAR)
@@ -59,34 +61,38 @@ class Game:
 
     def perform_move(self, input_type: str, perform: bool) -> None:
         if perform == False:
-            return 
+            return
 
         requires_update = False
         match input_type:
             case 'move_left':
-                success = self.move_handler.move_left(self.current_mino, self.board)
+                success = self.move_handler.move_left(
+                    self.current_mino, self.board)
                 if success:
                     requires_update = True
             case 'move_right':
-                success = self.move_handler.move_right(self.current_mino, self.board)
+                success = self.move_handler.move_right(
+                    self.current_mino, self.board)
                 if success:
                     requires_update = True
             case 'rotate_cw':
-                success = self.move_handler.rotate_cw(self.current_mino, self.board)
+                success = self.move_handler.rotate_cw(
+                    self.current_mino, self.board)
                 if success:
                     requires_update = True
             case 'rotate_ccw':
-                success = self.move_handler.rotate_ccw(self.current_mino, self.board)
+                success = self.move_handler.rotate_ccw(
+                    self.current_mino, self.board)
                 if success:
                     requires_update = True
             case 'hold':
                 requires_update = self.hold_mino()
-        
+
         if requires_update:
             self.notify_observers()
 
     def hold_mino(self) -> bool:
-        try: 
+        try:
             previously_held = self.hold.hold_mino(self.current_mino)
         except HoldDisabledException:
             return False
@@ -112,22 +118,24 @@ class Game:
             if self.gravity_pulls():
                 self.drop()
 
-    def hard_drop(self) -> None: 
+    def hard_drop(self) -> None:
         self.add_mino_to_board()
         self.hold.enable_hold()
         self.reset_gravity_ticks()
         self.notify_observers()
 
     def add_mino_to_board(self) -> None:
-        self.move_handler.hard_drop(self.current_mino, self.board) # Move mino to bottom
-        self.board_manager.add_mino(self.current_mino) # Mino becomes part of board now
+        self.move_handler.hard_drop(
+            self.current_mino, self.board)  # Move mino to bottom
+        # Mino becomes part of board now
+        self.board_manager.add_mino(self.current_mino)
         self.spawn_mino()   # Spawn new mino
 
     def drop(self) -> None:
         self.move_handler.move_down(self.current_mino, self.board)
         self.reset_gravity_ticks()
         self.notify_observers()
-    
+
     def reset_gravity_ticks(self) -> None:
         self.ticks_since_last_drop = 0
 
@@ -164,15 +172,19 @@ class Game:
         for observer in self.observers:
             observer.update(self, event)
 
+
 def foo(mino: Mino):
     mino.left()
 
+
 def test():
     game = Game()
-    a = GameInput(move_left=True, move_right=False, rotate_cw=True, rotate_ccw=False, rotate_180=False, hold=False, soft_drop=False, hard_drop=False)
+    a = GameInput(move_left=True, move_right=False, rotate_cw=True, rotate_ccw=False,
+                  rotate_180=False, hold=False, soft_drop=False, hard_drop=False)
     print(game.current_mino)
     game.update(a)
     print(game.current_mino)
+
 
 if __name__ == '__main__':
     test()

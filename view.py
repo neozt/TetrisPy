@@ -13,15 +13,17 @@ from position import Position
 SCREEN_WIDTH = 700
 SCREEN_HEIGHT = 700
 BOARD_POSITION = (200, 20)
-HOLDER_POSITION = (70,50)
-HOLDER_CELLS = (4,2)
+HOLDER_POSITION = (70, 50)
+HOLDER_CELLS = (4, 2)
 PREVIEW_POSITION = (550, 50)
-PREVIEW_CELLS = (4,2)
+PREVIEW_CELLS = (4, 2)
 PREVIEW_MARGIN = 15
 CELL_WIDTH = 30
 
+
 def normalised_position_to_holder_position(cell: Position):
-    return cell + Position(1,0)
+    return cell + Position(1, 0)
+
 
 class RectangleSprite(pygame.sprite.Sprite):
     def __init__(self, x: int, y: int, width: int, height: int, colour: str):
@@ -29,6 +31,7 @@ class RectangleSprite(pygame.sprite.Sprite):
         self.image = pygame.Surface((width, height))
         self.image.fill(colour)
         self.rect = pygame.Rect(x, y, width, height)
+
 
 class View:
     def __init__(self):
@@ -55,7 +58,7 @@ class View:
         for block in mino.blocks:
             x = BOARD_POSITION[0] + block.x * CELL_WIDTH
             y = BOARD_POSITION[1] + (19 - block.y) * CELL_WIDTH
-            if y < BOARD_POSITION[1]: 
+            if y < BOARD_POSITION[1]:
                 continue    # Don't draw block if higher than top of board
 
             mino_sprite.add(RectangleSprite(
@@ -69,11 +72,12 @@ class View:
             for column in range(board.columns):
                 x = BOARD_POSITION[0] + column * CELL_WIDTH
                 y = BOARD_POSITION[1] + row * CELL_WIDTH
-                # Since tetris board positive-y is opposite to pygame's positive-y, 
+                # Since tetris board positive-y is opposite to pygame's positive-y,
                 # we invert the y position to get the actual colour
                 pos = Position(column, board.rows - row - 1)
                 colour = board.get_cell_colour(pos)
-                board_sprite.add(RectangleSprite(x, y, CELL_WIDTH, CELL_WIDTH, colour))
+                board_sprite.add(RectangleSprite(
+                    x, y, CELL_WIDTH, CELL_WIDTH, colour))
         board_sprite.draw(self.surface)
 
     def draw_hold(self, hold: Hold):
@@ -81,7 +85,8 @@ class View:
 
         mino = hold.held_mino
         if mino is not None:
-            blocks = [normalised_position_to_holder_position(block) for block in mino.normalised_positions]
+            blocks = [normalised_position_to_holder_position(
+                block) for block in mino.normalised_positions]
             colour = mino.colour
         else:
             blocks = []
@@ -99,14 +104,18 @@ class View:
         preview_pieces = queue.peek(5)
         for i, piece in enumerate(preview_pieces):
             self.draw_preview(i, piece)
-        
+
     def draw_preview(self, i: int, piece: Mino):
         preview_sprite = pygame.sprite.Group()
-        blocks = [normalised_position_to_holder_position(block) for block in piece.normalised_positions]
+        blocks = [normalised_position_to_holder_position(
+            block) for block in piece.normalised_positions]
         for block in blocks:
             x = block.x * CELL_WIDTH + PREVIEW_POSITION[0]
-            vertical_offset = i * PREVIEW_CELLS[1] * (CELL_WIDTH + PREVIEW_MARGIN)    # offset due to preceeding preview pieces
-            y = (PREVIEW_CELLS[1] - block.y) * CELL_WIDTH + PREVIEW_POSITION[1] + vertical_offset
+            # offset due to preceeding preview pieces
+            vertical_offset = i * PREVIEW_CELLS[1]\
+                * (CELL_WIDTH+PREVIEW_MARGIN)
+            y = (PREVIEW_CELLS[1]-block.y)*CELL_WIDTH\
+                + PREVIEW_POSITION[1] + vertical_offset
             preview_sprite.add(
                 RectangleSprite(x, y, CELL_WIDTH, CELL_WIDTH, piece.colour)
             )
@@ -119,6 +128,7 @@ class View:
 
     def render_death(self, game: Game):
         print("GAME OVER")
+
 
 def test():
     pygame.init()
@@ -140,6 +150,7 @@ def test():
             # Did the user click the window close button? If so, stop the loop.
             elif event.type == QUIT:
                 running = False
+
 
 if __name__ == '__main__':
     test()

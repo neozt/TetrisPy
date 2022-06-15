@@ -7,6 +7,7 @@ from board import Board
 from position import Position
 from kicktable import KickTable
 
+
 def is_valid_position(mino: Mino, board: Board):
     # Check to ensure that none of the mino's blocks are outside playing area or in an occupied cell
     for block in mino.blocks:
@@ -21,8 +22,9 @@ def is_valid_position(mino: Mino, board: Board):
 
     return True
 
+
 def undo_if_invalid(fn):
-    # Decorator to save position of mino before performing move 
+    # Decorator to save position of mino before performing move
     # And restores the mino back to the original position if the move results in an invalid mino position
     # Returns if the move was successful or not
     def wrappedfn(*args, **kwargs) -> bool:
@@ -37,13 +39,14 @@ def undo_if_invalid(fn):
             mino.center = original_center
             mino.orientation = original_orientation
         return success
-            
+
     return wrappedfn
+
 
 class PieceMovement:
     def __init__(self, kick_table: KickTable = KickTable()) -> None:
         self.kick_table = kick_table
-        
+
     @undo_if_invalid
     def move_left(self, mino: Mino, board: Board):
         mino.left()
@@ -62,7 +65,6 @@ class PieceMovement:
         while (dropped):
             dropped = self.move_down(mino, board)
 
-
     def rotate_cw(self, mino: Mino, board: Board) -> bool:
         return self.rotate_with_kicks(mino, board, 'cw')
 
@@ -71,10 +73,12 @@ class PieceMovement:
 
     def rotate_with_kicks(self, mino: Mino, board: Board, direction: str) -> bool:
         current_orientation: Orientation = mino.orientation
-        target_orientation: Orientation = current_orientation.clockwise() if direction == 'cw' else current_orientation.counterclockwise()
-            
+        target_orientation: Orientation = current_orientation.clockwise(
+        ) if direction == 'cw' else current_orientation.counterclockwise()
+
         # Try each kicks in the kick table in sequence until the first valid kick is found
-        kicks = self.kick_table.get_kicks(current_orientation.value, target_orientation.value, mino.type)
+        kicks = self.kick_table.get_kicks(
+            current_orientation.value, target_orientation.value, mino.type)
         for kick in kicks:
             success = self.rotate_with_kick(mino, board, direction, kick)
             if success:
@@ -92,23 +96,20 @@ class PieceMovement:
         # "Kick" the mino by translating based on the offset
         mino.translate(offset)
 
-    
 
 def test():
     mover = PieceMovement()
     mino = mn.create_mino('Z')
     board = Board()
     print(mino)
-    board.set_cell_colour(Position(3,19) , 'red')
-    board.set_cell_colour(Position(5,19) , 'red')
-    board.set_cell_colour(Position(4,16) , 'red')
-
+    board.set_cell_colour(Position(3, 19), 'red')
+    board.set_cell_colour(Position(5, 19), 'red')
+    board.set_cell_colour(Position(4, 16), 'red')
 
     def rotate_and_print():
-        print(mover.rotate_cw(mino,board))
+        print(mover.rotate_cw(mino, board))
         print(mino)
         print(mino.blocks)
-
 
     rotate_and_print()
 

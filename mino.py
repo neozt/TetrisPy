@@ -4,6 +4,7 @@ from enum import Enum
 
 from position import Position, GridPosition
 
+
 class Orientation(Enum):
     UP = 0
     RIGHT = 1
@@ -16,8 +17,10 @@ class Orientation(Enum):
     def counterclockwise(self):
         return Orientation((self.value - 1) % len(Orientation))
 
-def rotations_required(start: Orientation, end:Orientation):
+
+def rotations_required(start: Orientation, end: Orientation):
     return (end.value - start.value) % len(Orientation)
+
 
 @dataclass
 class Mino(ABC):
@@ -32,12 +35,12 @@ class Mino(ABC):
     def blocks(self) -> list[Position]:
         # Returns the position of the four mino blocks based on its current orientation and center
         # This default inherited method is used by LJZST minos.
-        # O and I Minos will have to override this method as their center is in the middle of four cells, 
+        # O and I Minos will have to override this method as their center is in the middle of four cells,
         # unlike the other minos that have their center exactly on a cell.
-        # 
+        #
         # How it works:
         # - First, get the positions of the four blocks relative to its center
-        # - Then, rotate it into the correct orientation followed by a translation to get the actual positions of the blocks 
+        # - Then, rotate it into the correct orientation followed by a translation to get the actual positions of the blocks
         normalised_positions = self.normalised_positions
         block_positions = []
         times_to_rotate = rotations_required(Orientation.UP, self.orientation)
@@ -50,19 +53,19 @@ class Mino(ABC):
             # And then add mino's center position to each to get actual position
             actual_position = correctly_oriented + self.center
             block_positions.append(actual_position)
-        
+
         return block_positions
 
     def left(self) -> None:
-        self.translate((-1,0))
+        self.translate((-1, 0))
 
     def right(self) -> None:
-        self.translate((1,0))
+        self.translate((1, 0))
 
     def down(self) -> None:
-        self.translate((0,-1))
+        self.translate((0, -1))
 
-    def translate(self, offset: tuple[int,int]) -> None:
+    def translate(self, offset: tuple[int, int]) -> None:
         x, y = offset
         self.center = self.center + Position(x, y)
 
@@ -73,7 +76,7 @@ class Mino(ABC):
     def rotate_ccw(self) -> None:
         new_orientation = (self.orientation.value - 1) % len(Orientation)
         self.orientation = Orientation(new_orientation)
-        
+
 
 @dataclass
 class IMino(Mino):
@@ -81,7 +84,7 @@ class IMino(Mino):
     colour: str = 'blue'
     type: str = 'I'
 
-    @property 
+    @property
     def blocks(self) -> list[Position]:
         match self.orientation:
             case Orientation.UP:
@@ -110,11 +113,12 @@ class IMino(Mino):
     @property
     def normalised_positions(self):
         return [
-            Position(-1,1),
-            Position(0,1),
-            Position(1,1),
-            Position(2,1)
+            Position(-1, 1),
+            Position(0, 1),
+            Position(1, 1),
+            Position(2, 1)
         ]
+
 
 @dataclass
 class OMino(Mino):
@@ -122,23 +126,24 @@ class OMino(Mino):
     colour: str = 'yellow'
     type: str = 'O'
 
-    @property 
+    @property
     def blocks(self) -> list[Position]:
         return [
             self.center.top_left_position,
             self.center.top_right_position,
             self.center.bottom_left_position,
             self.center.bottom_right_position
-        ] 
-    
+        ]
+
     @property
     def normalised_positions(self):
         return [
-            Position(0,0),
-            Position(0,1),
-            Position(-1,0),
-            Position(-1,1)
-        ] 
+            Position(0, 0),
+            Position(0, 1),
+            Position(-1, 0),
+            Position(-1, 1)
+        ]
+
 
 @dataclass
 class JMino(Mino):
@@ -148,12 +153,13 @@ class JMino(Mino):
 
     @property
     def normalised_positions(self) -> list[Position]:
-        return  [
-            Position(-1,1), 
-            Position(-1,0), 
-            Position(0,0), 
-            Position(1,0) 
-            ]
+        return [
+            Position(-1, 1),
+            Position(-1, 0),
+            Position(0, 0),
+            Position(1, 0)
+        ]
+
 
 @dataclass
 class LMino(Mino):
@@ -163,12 +169,13 @@ class LMino(Mino):
 
     @property
     def normalised_positions(self) -> list[Position]:
-        return  [
-            Position(-1,0), 
-            Position(0,0), 
-            Position(1,0),
-            Position(1,1) 
-            ]
+        return [
+            Position(-1, 0),
+            Position(0, 0),
+            Position(1, 0),
+            Position(1, 1)
+        ]
+
 
 @dataclass
 class SMino(Mino):
@@ -178,12 +185,13 @@ class SMino(Mino):
 
     @property
     def normalised_positions(self) -> list[Position]:
-        return  [
-            Position(-1,0), 
-            Position(0,0), 
-            Position(0,1),
-            Position(1,1) 
-            ]
+        return [
+            Position(-1, 0),
+            Position(0, 0),
+            Position(0, 1),
+            Position(1, 1)
+        ]
+
 
 @dataclass
 class ZMino(Mino):
@@ -193,12 +201,13 @@ class ZMino(Mino):
 
     @property
     def normalised_positions(self) -> list[Position]:
-        return  [
-            Position(-1,1), 
-            Position(0,1), 
-            Position(0,0), 
-            Position(1,0) 
-            ]
+        return [
+            Position(-1, 1),
+            Position(0, 1),
+            Position(0, 0),
+            Position(1, 0)
+        ]
+
 
 @dataclass
 class TMino(Mino):
@@ -208,12 +217,13 @@ class TMino(Mino):
 
     @property
     def normalised_positions(self) -> list[Position]:
-        return  [
-            Position(-1,0), 
-            Position(0,0), 
-            Position(0,1), 
-            Position(1,0) 
-            ]
+        return [
+            Position(-1, 0),
+            Position(0, 0),
+            Position(0, 1),
+            Position(1, 0)
+        ]
+
 
 def create_mino(type: str) -> Mino:
     match type:
@@ -225,9 +235,11 @@ def create_mino(type: str) -> Mino:
         case 'T': return TMino()
         case 'O': return OMino()
 
+
 def rotate(point: Position) -> Position:
     """Rotate point 90 degrees about origin"""
     return Position(point.y, -point.x)
+
 
 def test():
     a = create_mino('I')
@@ -237,6 +249,7 @@ def test():
     a.rotate_cw()
     print(a)
     print(a.blocks)
+
 
 if __name__ == '__main__':
     test()

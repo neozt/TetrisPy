@@ -4,16 +4,17 @@ import random
 
 PREVIEW_LENGTH = 5
 
+
 class PieceQueue:
     def __init__(self) -> None:
         self.queue: list[Mino] = list()
         self.add_new_bag()
-        
+
     def __repr__(self) -> str:
         return f'<PieceQueue: {self.queue}>'
 
     def add_new_bag(self) -> None:
-        bag = ['I','L','J','T','S','Z','O']
+        bag = ['I', 'L', 'J', 'T', 'S', 'Z', 'O']
         random.shuffle(bag)
         for piece in bag:
             self.queue.append(mino.create_mino(piece))
@@ -30,7 +31,6 @@ class PieceQueue:
             return self.queue[0:num]
 
 
-
 def main():
     queue = PieceQueue(None)
     print(queue)
@@ -40,6 +40,6 @@ def main():
     print(arr)
     print(queue)
 
+
 if __name__ == '__main__':
     main()
-
