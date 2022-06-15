@@ -1,6 +1,7 @@
+import random
+
 import mino
 from mino import Mino
-import random
 
 PREVIEW_LENGTH = 5
 

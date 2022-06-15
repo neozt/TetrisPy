@@ -1,13 +1,11 @@
-from game import Game, EventType
-from board import Board
-from pieceholder import Hold
-import mino as mn
-from mino import Mino
-
 import pygame
 from pygame.locals import *
-from piecequeue import PieceQueue
 
+from game import Game, EventType
+from board import Board
+from mino import Mino
+from pieceholder import Hold
+from piecequeue import PieceQueue
 from position import Position
 
 SCREEN_WIDTH = 700

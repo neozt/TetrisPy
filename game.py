@@ -1,3 +1,6 @@
+from dataclasses import dataclass, asdict
+from enum import Enum, auto
+
 from mino import Mino
 from board import Board, BoardManager
 from pieceholder import Hold, HoldDisabledException
@@ -5,9 +8,6 @@ from piecequeue import PieceQueue
 from piecemovement import PieceMovement
 from lineclear import LineClear
 from inputs import GameInput
-
-from dataclasses import dataclass, asdict
-from enum import Enum, auto
 
 
 class EventType(Enum):

@@ -1,9 +1,9 @@
 import pygame
-from game import Game
-from inputs import Input, UserInput, InputProcessor
-from view import View
-
 from pygame.locals import *
+
+from game import Game
+from inputs import UserInput, InputProcessor
+from view import View
 
 
 def main():

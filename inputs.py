@@ -1,8 +1,4 @@
-import pygame
 from pygame.locals import *
-from typing import ClassVar
-from enum import Enum
-
 from dataclasses import dataclass, field
 
 MOVE_LEFT = K_LEFT
