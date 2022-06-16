@@ -10,14 +10,20 @@ class LineClear:
 
     @property
     def score(self):
-        if self.tspin:
-            send = 2 * self.lines
-        else:
-            if self.lines == 4:
+        match (self.lines, self.tspin):
+            case (_, True):
+                # Tspins are worth double the lines sent
+                send = 2 * self.lines
+            case (1, False):
+                # Single is worth very little
+                send = 0.01
+            case (4, False):
+                # Tetrises are worth 4
                 send = 4
-            else:
+            case (_, False):
+                # Doubles and Triples are worth 1 and 2 points resp.
                 send = self.lines - 1
-        return send * 100
+        return int(send * 100)
 
     @property
     def string(self):

@@ -1,3 +1,4 @@
+from mailbox import linesep
 import pygame
 from pygame.locals import *
 
@@ -18,6 +19,13 @@ PREVIEW_CELLS = (4, 2)
 PREVIEW_MARGIN = 15
 CELL_WIDTH = 30
 
+SCORE_POSITION = (50, 200)
+FONT_COLOUR_NORMAL = (255, 255, 255)
+FONT_COLOUR_FOCUS = (255, 255, 0)
+LINE_SEPERATION = 25
+FONT = 'Calibri'
+FONT_SIZE = 30
+
 
 def normalised_position_to_holder_position(cell: Position):
     return cell + Position(1, 0)
@@ -34,6 +42,8 @@ class RectangleSprite(pygame.sprite.Sprite):
 class View:
     def __init__(self):
         self.surface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        pygame.font.init()
+        self.font = pygame.font.SysFont(FONT, FONT_SIZE)
 
     def update(self, game: Game, update_type: EventType = EventType.NORMAL):
         if update_type == EventType.LINE_CLEAR:
@@ -43,6 +53,13 @@ class View:
 
         self.render_game(game)
 
+    def render_line_clear(self, game: Game):
+        pass
+
+    def render_death(self, game: Game):
+        print(f'Game Over. Your final score was {game.current_score}.')
+        print('Thank you for playing!')
+
     def render_game(self, game: Game):
         self.surface.fill('black')
         self.draw_board(game.board)
@@ -50,7 +67,12 @@ class View:
         self.draw_previews(game.queue)
         self.draw_shadow(game.get_shadow())
         self.draw_mino(game.current_mino)
+        self.draw_score(game)
         pygame.display.flip()
+
+    def draw_score(self, game: Game):
+        self.write_line_clears(game)
+        self.write_score(game)
 
     def draw_mino(self, mino: Mino):
         mino_sprite = pygame.sprite.Group()
@@ -123,36 +145,21 @@ class View:
             )
         preview_sprite.draw(self.surface)
 
-    def render_line_clear(self, game: Game):
-        print(f'Line cleared: {game.previous_line_clear.abbreviation}')
-        print(f'Current score: {game.current_score}')
-        game.print_history()
+    def write_line_clears(self, game: Game):
+        pos_x = SCORE_POSITION[0]
+        pos_y = SCORE_POSITION[1]
 
-    def render_death(self, game: Game):
-        print("GAME OVER")
+        for i, (line_clear_type, count) in enumerate(game.line_clears.items()):
+            string = f'{line_clear_type.abbreviation}: {count}'
+            colour = FONT_COLOUR_FOCUS if line_clear_type == game.previous_line_clear else FONT_COLOUR_NORMAL
+            self.write_line(string, pos_x, pos_y + i*LINE_SEPERATION, colour)
 
+    def write_score(self, game: Game):
+        pos_y = SCORE_POSITION[1] + (len(game.line_clears)+2)*LINE_SEPERATION
+        self.write_line('Total Score:', SCORE_POSITION[0], pos_y)
+        self.write_line(str(game.current_score),
+                        SCORE_POSITION[0], pos_y + LINE_SEPERATION)
 
-def test():
-    pygame.init()
-    surface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    game = Game()
-    view = View(surface)
-    view.update(game)
-    pygame.display.flip()
-    running = True
-    while running:
-        # Look at every event in the queue
-        for event in pygame.event.get():
-            # Did the user hit a key?
-            if event.type == KEYDOWN:
-                # Was it the Escape key? If so, stop the loop.
-                if event.key == K_ESCAPE:
-                    running = False
-
-            # Did the user click the window close button? If so, stop the loop.
-            elif event.type == QUIT:
-                running = False
-
-
-if __name__ == '__main__':
-    test()
+    def write_line(self, text: str, x: int, y: int, colour: tuple[int, int, int] = FONT_COLOUR_NORMAL) -> None:
+        text_surface = self.font.render(text, True, colour)
+        self.surface.blit(text_surface, (x, y))
