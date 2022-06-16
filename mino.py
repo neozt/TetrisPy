@@ -81,7 +81,7 @@ class Mino(ABC):
 @dataclass
 class IMino(Mino):
     center: GridPosition = GridPosition(5, 19)
-    colour: str = 'blue'
+    colour: tuple[int, int, int] = (0, 255, 255)
     type: str = 'I'
 
     @property
@@ -123,7 +123,7 @@ class IMino(Mino):
 @dataclass
 class OMino(Mino):
     center: GridPosition = GridPosition(5, 19)
-    colour: str = 'yellow'
+    colour: tuple[int, int, int] = (255, 255, 0)
     type: str = 'O'
 
     @property
@@ -148,7 +148,7 @@ class OMino(Mino):
 @dataclass
 class JMino(Mino):
     center: Position = Position(4, 19)
-    colour = 'dark blue'
+    colour: tuple[int, int, int] = (0, 0, 255)
     type: str = 'J'
 
     @property
@@ -164,7 +164,7 @@ class JMino(Mino):
 @dataclass
 class LMino(Mino):
     center: Position = Position(4, 19)
-    colour: str = 'orange'
+    colour: tuple[int, int, int] = (255, 170, 0)
     type: str = 'L'
 
     @property
@@ -180,7 +180,7 @@ class LMino(Mino):
 @dataclass
 class SMino(Mino):
     center: Position = Position(4, 19)
-    colour: str = 'green'
+    colour: tuple[int, int, int] = (0, 255, 0)
     type: str = 'S'
 
     @property
@@ -196,7 +196,7 @@ class SMino(Mino):
 @dataclass
 class ZMino(Mino):
     center: Position = Position(4, 19)
-    colour: str = 'red'
+    colour: tuple[int, int, int] = (255, 0, 0)
     type: str = 'Z'
 
     @property
@@ -212,7 +212,7 @@ class ZMino(Mino):
 @dataclass
 class TMino(Mino):
     center: Position = Position(4, 19)
-    colour: str = 'purple'
+    colour: tuple[int, int, int] = (153, 0, 255)
     type: str = 'T'
 
     @property

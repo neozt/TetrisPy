@@ -48,6 +48,7 @@ class View:
         self.draw_board(game.board)
         self.draw_hold(game.hold)
         self.draw_previews(game.queue)
+        self.draw_shadow(game.get_shadow())
         self.draw_mino(game.current_mino)
         pygame.display.flip()
 
@@ -63,6 +64,9 @@ class View:
                 x, y, CELL_WIDTH, CELL_WIDTH, mino.colour
             ))
         mino_sprite.draw(self.surface)
+
+    def draw_shadow(self, mino: Mino):
+        self.draw_mino(mino)
 
     def draw_board(self, board: Board):
         board_sprite = pygame.sprite.Group()
@@ -122,7 +126,7 @@ class View:
     def render_line_clear(self, game: Game):
         print(f'Line cleared: {game.previous_line_clear.abbreviation}')
         print(f'Current score: {game.current_score}')
-        print(f'History {game.line_clears}')
+        game.print_history()
 
     def render_death(self, game: Game):
         print("GAME OVER")

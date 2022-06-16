@@ -63,7 +63,7 @@ class InputProcessor:
     """
     das: int = 10
     arr: int = 1
-    softdrop_gravity: int = 5
+    softdrop_gravity: int = 2
 
     # Variables to remember state
     rotate_cw_held: bool = field(default=False, init=False)

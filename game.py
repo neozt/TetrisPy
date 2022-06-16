@@ -1,3 +1,4 @@
+import copy
 from dataclasses import dataclass, asdict
 from enum import Enum, auto
 
@@ -16,6 +17,18 @@ class EventType(Enum):
     DEATH = auto()
 
 
+def default_history_dict() -> dict[LineClear, int]:
+    return {
+        LineClear(1, False): 0,
+        LineClear(2, False): 0,
+        LineClear(3, False): 0,
+        LineClear(4, False): 0,
+        LineClear(1, True): 0,
+        LineClear(2, True): 0,
+        LineClear(3, True): 0
+    }
+
+
 class Game:
     def __init__(self, gravity=30):
         self.board: Board = Board()
@@ -32,7 +45,7 @@ class Game:
         self.gravity = gravity
 
         self.previous_line_clear: LineClear = None
-        self.line_clears: dict[LineClear, int] = {}
+        self.line_clears: dict[LineClear, int] = default_history_dict()
 
         self.observers = []
 
@@ -151,7 +164,7 @@ class Game:
         dead = self.check_death()
         if dead:
             self.notify_observers(EventType.DEATH)
-            self.end_game()
+            self.end()
 
     def check_death(self):
         for block in self.current_mino.blocks:
@@ -159,12 +172,28 @@ class Game:
                 return True
         return False
 
-    def end_game(self):
+    def end(self):
         self.alive = False
+
+    def get_shadow(self):
+        def fade_colour(colour: tuple[int, int, int]) -> tuple[int, int, int]:
+            return (169, 169, 169)
+            return (int(colour[0]/2), int(colour[1]/2), int(colour[2]/2))
+        # Create copy of current mino
+        shadow = copy.copy(self.current_mino)
+        # Set colour as a faded version of its original colour
+        shadow.colour = fade_colour(shadow.colour)
+        # Move shadow down as much as possible
+        self.move_handler.hard_drop(shadow, self.board)
+        return shadow
 
     @property
     def current_score(self) -> int:
         return sum(clear_type.score * count for clear_type, count in self.line_clears.items())
+
+    def print_history(self) -> int:
+        for lc, count in self.line_clears.items():
+            print(f'{lc.abbreviation}: {count}')
 
     def add_line_clear(self, line_clear: LineClear) -> None:
         self.previous_line_clear = line_clear

@@ -21,15 +21,18 @@ def main():
         # Handle termination
         for event in pygame.event.get():
             if event.type == KEYDOWN and event.key == K_ESCAPE:
-                game.alive = False
+                game.end()
             elif event.type == QUIT:
-                game.alive = False
+                game.end()
 
+        # Get user input and process it to obtain game input
         inputs = input_processor.process_inputs(
             UserInput(pygame.key.get_pressed())
         )
+        # Tick the game and update based on input
         game.update(inputs)
 
+        # Limit framerate
         clock.tick(60)
 
     pygame.quit()
