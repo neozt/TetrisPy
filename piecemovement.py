@@ -1,4 +1,5 @@
 from copy import copy
+from turtle import undo
 
 import mino as mn
 import board as bd
@@ -78,6 +79,12 @@ class PieceMovement:
 
     def rotate_ccw(self, mino: Mino, board: Board) -> bool:
         return self.rotate_with_kicks(mino, board, 'ccw')
+
+    @undo_if_invalid
+    def rotate_180(self, mino: Mino, board: Board) -> MoveType:
+        mino.rotate_cw()
+        mino.rotate_cw()
+        return MoveType.ROTATE_180
 
     def rotate_with_kicks(self, mino: Mino, board: Board, direction: str) -> bool:
         current_orientation: Orientation = mino.orientation

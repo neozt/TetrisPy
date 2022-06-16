@@ -68,6 +68,7 @@ class InputProcessor:
     # Variables to remember state
     rotate_cw_held: bool = field(default=False, init=False)
     rotate_ccw_held: bool = field(default=False, init=False)
+    rotate_180_held: bool = field(default=False, init=False)
     hold_held: bool = field(default=False, init=False)
     harddrop_held: bool = field(default=False, init=False)
     softdrop_held_for: int = field(default=0, init=False)
@@ -76,9 +77,12 @@ class InputProcessor:
     def process_inputs(self, inputs: UserInput) -> GameInput:
         move_left, move_right = self.handle_horizontal_inputs(
             inputs.move_left, inputs.move_right)
+
         rotate_cw, rotate_ccw, rotate_180 = self.handle_rotates(
             inputs.rotate_cw, inputs.rotate_ccw, inputs.rotate_180)
+
         hold = self.handle_hold(inputs.hold)
+
         soft_drop, hard_drop = self.handle_drops(
             inputs.soft_drop, inputs.hard_drop)
 
@@ -120,21 +124,27 @@ class InputProcessor:
             return shift
 
     def handle_rotates(self, cw: bool, ccw: bool, hundred_eighty: bool) -> tuple[bool, bool, bool]:
-        clockwise = counterclockwise = hundred_eighty = False
+        rotate_cw = rotate_ccw = rotate_180 = False
         if not cw:
             self.rotate_cw_held = False
         else:
             # Rotate only if button isn't being held
-            clockwise = not self.rotate_cw_held
+            rotate_cw = not self.rotate_cw_held
             self.rotate_cw_held = True
 
         if not ccw:
             self.rotate_ccw_held = False
         else:
-            counterclockwise = not self.rotate_ccw_held
+            rotate_ccw = not self.rotate_ccw_held
             self.rotate_ccw_held = True
 
-        return clockwise, counterclockwise, hundred_eighty
+        if not hundred_eighty:
+            self.rotate_180_held = False
+        else:
+            rotate_180 = not self.rotate_180_held
+            self.rotate_180_held = True
+
+        return rotate_cw, rotate_ccw, rotate_180
 
     def handle_hold(self, hold: bool) -> bool:
         should_hold = False

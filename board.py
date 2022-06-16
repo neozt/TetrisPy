@@ -84,11 +84,10 @@ class BoardManager:
         # 2. The last move before the TMino was placed should be a rotation
         # 3. 3-4 corners of the center of the TMino should be occupied
         #    (either by solid blocks or walls/floors of the board)
-        print(previous_move)
         if mino.type != 'T':
             return False
 
-        if previous_move != MoveType.ROTATE_CW and previous_move != MoveType.ROTATE_CCW:
+        if not previous_move.is_rotation():
             return False
 
         corners = get_corners(mino.center)

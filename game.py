@@ -85,6 +85,11 @@ class Game:
                     self.current_mino, self.board)
                 if success:
                     requires_update = True
+            case 'rotate_180':
+                success = self.move_handler.rotate_180(
+                    self.current_mino, self.board)
+                if success:
+                    requires_update = True
             case 'hold':
                 requires_update = self.hold_mino()
 
