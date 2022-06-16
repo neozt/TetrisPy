@@ -49,7 +49,7 @@ class Game:
     def handle_line_clears(self):
         # Check if there are any lines that need to be cleared
         line_clear = self.board_manager.find_and_clear_lines(
-            self.previous_mino)
+            self.previous_mino, self.move_handler.recent_move_executed)
         if line_clear is not None:
             self.add_line_clear(line_clear)
             self.notify_observers(EventType.LINE_CLEAR)
@@ -171,20 +171,3 @@ class Game:
     def notify_observers(self, event: EventType = EventType.NORMAL) -> None:
         for observer in self.observers:
             observer.update(self, event)
-
-
-def foo(mino: Mino):
-    mino.left()
-
-
-def test():
-    game = Game()
-    a = GameInput(move_left=True, move_right=False, rotate_cw=True, rotate_ccw=False,
-                  rotate_180=False, hold=False, soft_drop=False, hard_drop=False)
-    print(game.current_mino)
-    game.update(a)
-    print(game.current_mino)
-
-
-if __name__ == '__main__':
-    test()

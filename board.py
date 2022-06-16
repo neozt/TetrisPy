@@ -1,6 +1,7 @@
 from position import Position
 from lineclear import LineClear
 from mino import Mino
+from movetype import MoveType
 
 ROWS = 20
 COLUMNS = 10
@@ -66,20 +67,30 @@ class BoardManager:
     def __init__(self, board: Board) -> None:
         self.board = board
 
-    def find_and_clear_lines(self, mino: Mino) -> LineClear | None:
+    def find_and_clear_lines(self, mino: Mino, previous_move: MoveType) -> LineClear | None:
         filled_lines = self.find_filled_lines()
         if filled_lines:
-            tspin = self.detect_tspin(mino)
+            tspin = self.detect_tspin(mino, previous_move)
             num_lines_cleared = len(filled_lines)
             self.clear_lines(filled_lines)
             return LineClear(num_lines_cleared, tspin)
 
         return None
 
-    def detect_tspin(self, mino: Mino) -> bool:
+    def detect_tspin(self, mino: Mino, previous_move: MoveType) -> bool:
         # Returns true if the line clear was a t spin
+        # Three criteria for a line clear to be considered a T-spin:
+        # 1. The mino placed causing the line clear should be a TMino
+        # 2. The last move before the TMino was placed should be a rotation
+        # 3. 3-4 corners of the center of the TMino should be occupied
+        #    (either by solid blocks or walls/floors of the board)
+        print(previous_move)
         if mino.type != 'T':
             return False
+
+        if previous_move != MoveType.ROTATE_CW and previous_move != MoveType.ROTATE_CCW:
+            return False
+
         corners = get_corners(mino.center)
         occupied_corners = 0
         for corner in corners:

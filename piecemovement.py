@@ -6,6 +6,7 @@ from mino import Mino, Orientation
 from board import Board
 from position import Position
 from kicktable import KickTable
+from movetype import MoveType
 
 
 def is_valid_position(mino: Mino, board: Board):
@@ -26,16 +27,19 @@ def is_valid_position(mino: Mino, board: Board):
 def undo_if_invalid(fn):
     # Decorator to save position of mino before performing move
     # And restores the mino back to the original position if the move results in an invalid mino position
-    # Returns if the move was successful or not
+    # If the move was successfuly, set the move as the movehandler's recent_move_executed and return True
     def wrappedfn(*args, **kwargs) -> bool:
-        mino = args[1]
-        board = args[2]
+        movehandler: PieceMovement = args[0]
+        mino: Mino = args[1]
+        board: Board = args[2]
         original_center = copy(mino.center)
         original_orientation = copy(mino.orientation)
-        fn(*args, **kwargs)
+        move_type = fn(*args, **kwargs)
 
         success = is_valid_position(mino, board)
-        if not success:
+        if success:
+            movehandler.recent_move_executed = move_type
+        else:
             mino.center = original_center
             mino.orientation = original_orientation
         return success
@@ -45,19 +49,23 @@ def undo_if_invalid(fn):
 
 class PieceMovement:
     def __init__(self, kick_table: KickTable = KickTable()) -> None:
-        self.kick_table = kick_table
+        self.kick_table: KickTable = kick_table
+        self.recent_move_executed: MoveType = None
 
-    @undo_if_invalid
-    def move_left(self, mino: Mino, board: Board):
+    @ undo_if_invalid
+    def move_left(self, mino: Mino, board: Board) -> MoveType:
         mino.left()
+        return MoveType.LEFT
 
-    @undo_if_invalid
-    def move_right(self, mino: Mino, board: Board):
+    @ undo_if_invalid
+    def move_right(self, mino: Mino, board: Board) -> MoveType:
         mino.right()
+        return MoveType.RIGHT
 
-    @undo_if_invalid
-    def move_down(self, mino: Mino, board: Board):
+    @ undo_if_invalid
+    def move_down(self, mino: Mino, board: Board) -> MoveType:
         mino.down()
+        return MoveType.DOWN
 
     def hard_drop(self, mino: Mino, board: Board) -> None:
         # Move mino down until no longer possible
@@ -85,16 +93,19 @@ class PieceMovement:
                 break
         return success
 
-    @undo_if_invalid
-    def rotate_with_kick(self, mino: Mino, board: Board, direction: str, offset: tuple[int, int]) -> bool:
+    @ undo_if_invalid
+    def rotate_with_kick(self, mino: Mino, board: Board, direction: str, offset: tuple[int, int]) -> MoveType:
         # Rotates based on direction
         if direction == 'cw':
             mino.rotate_cw()
+            rotate_type = MoveType.ROTATE_CW
         elif direction == 'ccw':
             mino.rotate_ccw()
+            rotate_type = MoveType.ROTATE_CCW
 
         # "Kick" the mino by translating based on the offset
         mino.translate(offset)
+        return rotate_type
 
 
 def test():
@@ -115,4 +126,5 @@ def test():
 
 
 if __name__ == '__main__':
-    test()
+    # test()
+    pass
