@@ -11,7 +11,7 @@ EMPTY_ROW = [EMPTY for x in range(COLUMNS)]
 
 class Board:
     """
-    Class that holds board state in a 10 by 20 array. 
+    Class that holds board state in a 10 by 20 array.
     (0,0) denotes the bottom left corner, (10,20) denotes the top right corner.
     The elements in the array represents the colour of the corresponding cell.
     """
@@ -60,7 +60,7 @@ class Board:
 
 class BoardManager:
     """
-    Class to manage higher level board operations such as finding cleared lines and 
+    Class to manage higher level board operations such as finding cleared lines and
     performing line clears.
     """
 

@@ -31,23 +31,30 @@ def default_history_dict() -> dict[LineClear, int]:
 
 class Game:
     def __init__(self, gravity=30):
+        self.observers = []
+        self.gravity = gravity
+        self.start()
+
+    def start(self):
         self.board: Board = Board()
         self.board_manager: BoardManager = BoardManager(self.board)
         self.queue: PieceQueue = PieceQueue()
         self.hold: Hold = Hold()
+
         self.move_handler: PieceMovement = PieceMovement()
+        # move_handler.hard_drop() is invoked when generating shadow, so we use a
+        # seperate instance to not affect normal movement (since move_handler) needs to keep
+        # track of previous movement
+        self.shadow_move_handler: PieceMovement = PieceMovement()
 
         self.current_mino: Mino = self.queue.pop()
         self.previous_mino: Mino = None
 
         self.alive = True
         self.ticks_since_last_drop = 0
-        self.gravity = gravity
 
         self.previous_line_clear: LineClear = None
         self.line_clears: dict[LineClear, int] = default_history_dict()
-
-        self.observers = []
 
     def update(self, input: GameInput):
         # Handle user input
@@ -177,14 +184,15 @@ class Game:
 
     def get_shadow(self):
         def fade_colour(colour: tuple[int, int, int]) -> tuple[int, int, int]:
-            return (169, 169, 169)
-            return (int(colour[0]/2), int(colour[1]/2), int(colour[2]/2))
+            # return (169, 169, 169)
+            return (int(colour[0]/3), int(colour[1]/3), int(colour[2]/3))
+
         # Create copy of current mino
         shadow = copy.copy(self.current_mino)
         # Set colour as a faded version of its original colour
         shadow.colour = fade_colour(shadow.colour)
         # Move shadow down as much as possible
-        self.move_handler.hard_drop(shadow, self.board)
+        self.shadow_move_handler.hard_drop(shadow, self.board)
         return shadow
 
     @property
