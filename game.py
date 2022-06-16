@@ -178,9 +178,13 @@ class Game:
             self.end()
 
     def check_death(self):
+        # Dies if new mino spawns directly in a block, implying that it is actually unable to spawn
         for block in self.current_mino.blocks:
             if self.board.is_cell_occupied(block):
                 return True
+        # Dies if there are blocks in the 21st row (unplayable area)
+        if self.board_manager.exceeds_playing_area():
+            return True
         return False
 
     def end(self):

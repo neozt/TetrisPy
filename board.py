@@ -53,7 +53,7 @@ class Board:
                 f'Cell should be within (0,0) -> ({ROWS-1},{COLUMNS-1})')
 
     def is_cell_occupied(self, cell: Position) -> bool:
-        if not 0 <= cell.x < COLUMNS or not 0 <= cell.y < ROWS:
+        if not 0 <= cell.x < self.columns or not 0 <= cell.y < self.rows + 1:
             return False
         return not is_empty(self.get_cell_colour(cell))
 
@@ -120,6 +120,14 @@ class BoardManager:
         for block in mino.blocks:
             self.board.set_cell_colour(block, mino.colour)
 
+    def exceeds_playing_area(self) -> bool:
+        """Checks if any block is outside of playing area (in the 21st row)"""
+        for i in range(self.board.columns):
+            if self.board.is_cell_occupied(Position(i, self.board.rows)):
+                # if not is_empty(self.board.board_arr[self.board.rows][i]):
+                return True
+        return False
+
 
 def get_corners(position: Position) -> list[Position]:
     corners = []
@@ -145,7 +153,9 @@ def is_occupied(position: Position, board: Board):
 
 
 def init_board(board):
-    for _ in range(ROWS):
+    # Board is initialised with 21 rows even though the playable area only consists of the bottom 20 rows
+    # The 21st row is to facilitate with checking for death
+    for _ in range(ROWS + 1):
         add_empty_row(board)
 
 
@@ -166,24 +176,6 @@ def is_row_filled(row) -> bool:
 
 def test():
     board = Board()
-    board.set_cell_colour(Position(0, 0), 'red')
-    board.set_cell_colour(Position(9, 2), 'green')
-    board.set_cell_colour(Position(9, 19), 'green')
-    a = board.get_cell_colour(Position(0, 0))
-    b = board.get_cell_colour(Position(0, 11))
-    print(board)
-    for i in range(COLUMNS):
-        cell = Position(i, 1)
-        board.set_cell_colour(cell, 'yellow')
-        cell = Position(i, 5)
-        board.set_cell_colour(cell, 'yellow')
-        cell = Position(i, 10)
-        board.set_cell_colour(cell, 'yellow')
-    print(board)
-    bm = BoardManager(board)
-    print(cl := bm.find_filled_lines())
-    bm.clear_lines(cl)
-    print(board)
 
 
 if __name__ == '__main__':
