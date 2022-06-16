@@ -33,7 +33,6 @@ class Game:
     def __init__(self, gravity=30):
         self.observers = []
         self.gravity = gravity
-        self.start()
 
     def start(self):
         self.board: Board = Board()
@@ -44,7 +43,7 @@ class Game:
         self.move_handler: PieceMovement = PieceMovement()
         # move_handler.hard_drop() is invoked when generating shadow, so we use a
         # seperate instance to not affect normal movement (since move_handler) needs to keep
-        # track of previous movement
+        # track of previous movement for tspin detection
         self.shadow_move_handler: PieceMovement = PieceMovement()
 
         self.current_mino: Mino = self.queue.pop()
@@ -55,6 +54,11 @@ class Game:
 
         self.previous_line_clear: LineClear = None
         self.line_clears: dict[LineClear, int] = default_history_dict()
+
+        self.notify_observers()
+
+    def reset(self):
+        self.start()
 
     def update(self, input: GameInput):
         # Handle user input

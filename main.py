@@ -14,14 +14,16 @@ def main():
 
     pygame.init()
     clock = pygame.time.Clock()
-
-    view.render_game(game)
+    game.start()
 
     while game.alive:
-        # Handle termination
+        # Handle termination / reset
         for event in pygame.event.get():
-            if event.type == KEYDOWN and event.key == K_ESCAPE:
-                game.end()
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    game.end()
+                elif event.key == K_F4:
+                    game.start()
             elif event.type == QUIT:
                 game.end()
 
