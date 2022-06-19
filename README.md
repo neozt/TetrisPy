@@ -13,6 +13,7 @@ Tetris implemented using pygame.
 `Arrow-Right`: Move right  
 `Arrow-Up`: Rotate clockwise  
 `Z`: Rotate counterclockwise  
+`A`: Rotate 180 degrees  
 `Arrow-Down`: Softdrop  
 `Space`: Harddrop  
 `C`: Hold piece
