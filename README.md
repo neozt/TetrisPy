@@ -1,6 +1,5 @@
 # TetrisPy
 Tetris implemented using pygame.
-***
 
 ## How to play
 1. Clone the repo
@@ -8,17 +7,15 @@ Tetris implemented using pygame.
 3. Run main.py file (Tested on Python 3.10.4)
 
     >```python3 main.py```
-***
 
 ## Keybinds
 `Arrow-Left`: Move left  
 `Arrow-Right`: Move right  
-`Arrow-Up`:Rotate clockwise  
+`Arrow-Up`: Rotate clockwise  
 `Z`: Rotate counterclockwise  
 `Arrow-Down`: Softdrop  
 `Space`: Harddrop  
 `C`: Hold piece
-***
 
 ## Features
 Implements most of the featrues associated with modern, guideline Tetris, including:
@@ -35,7 +32,6 @@ Implements most of the featrues associated with modern, guideline Tetris, includ
 - 7-bag randomizer
 - SRS kicktable for piece rotations
 - T-spins
-***
 
 ## Scoring
 Different types of line clears are scored as follows:
@@ -48,7 +44,6 @@ Different types of line clears are scored as follows:
 |T-Spin Single (**TSS**)|200|
 |T-Spin Double (**TSD**)|400|
 |T-Sping Triple (**TST**)|600|
-***
 
 ## Unimplemented Features
 Features that I *might* come back around to implementing (eventually)
