@@ -17,6 +17,7 @@ Tetris implemented using pygame.
 `Arrow-Down`: Softdrop  
 `Space`: Harddrop  
 `C`: Hold piece
+`F4`: Restart game
 
 ## Features
 Implements most of the featrues associated with modern, guideline Tetris, including:
