@@ -16,7 +16,7 @@ Tetris implemented using pygame.
 `A`: Rotate 180 degrees  
 `Arrow-Down`: Softdrop  
 `Space`: Harddrop  
-`C`: Hold piece
+`C`: Hold piece  
 `F4`: Restart game
 
 ## Features
